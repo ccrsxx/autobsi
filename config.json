@@ -1,28 +1,28 @@
 {
   "schedule": {
     "Monday": {
-      "name": "nama pelajaran",
-      "time": ["start", "end"],
-      "link": "link"
+      "name": "class name",
+      "time": ["class start time", "class end time"],
+      "link": "class link"
     },
     "Tuesday": {
-      "name": "nama pelajaran",
-      "time": ["start", "end"],
-      "link": "link"
+      "name": "class name",
+      "time": ["class start time", "class end time"],
+      "link": "class link"
     },
     "Wednesday": {
-      "name": "nama pelajaran",
-      "time": ["start", "end"],
-      "link": "link"
+      "name": "class name",
+      "time": ["class start time", "class end time"],
+      "link": "class link"
     },
     "Thursday": {
-      "name": ["nama pelajaran", "nama pelajaran2"],
-      "time": [["start1", "end1"], ["start2", "end2"]],
-      "link": ["link1", "link2"]
+      "name": ["class name 1", "class name 2"],
+      "time": [["class start time 1", "class endtime 2"], ["class start time 1", "class endtime 2"]],
+      "link": ["class link 1", "class link 2"]
     }
   },
-  "username": "nim",
+  "username": "username",
   "password": "password",
   "email": "email",
-  "mail_pass": "password"
+  "email_app_password": "password"
 }
