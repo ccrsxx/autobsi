@@ -2,23 +2,23 @@
   "schedule": {
     "Monday": {
       "name": "class name",
-      "time": ["class_start_time", "class_end_time"],
-      "link": "class_link"
+      "time": ["class start time", "class end time"],
+      "link": "class link"
     },
     "Tuesday": {
       "name": "class name",
-      "time": ["class_start_time", "class_end_time"],
-      "link": "class_link"
+      "time": ["class start time", "class end time"],
+      "link": "class link"
     },
     "Wednesday": {
       "name": "class name",
-      "time": ["class_start_time", "class_end_time"],
-      "link": "class_link"
+      "time": ["class start time", "class end time"],
+      "link": "class link"
     },
     "Thursday": {
-      "name": ["class name", "class name2"],
-      "time": [["class_start_time1", "class_endtime2"], ["class_start_time1", "class_endtime2"]],
-      "link": ["class_link1", "class_link2"]
+      "name": ["class name 1", "class name 2"],
+      "time": [["class start time 1", "class endtime 2"], ["class start time 1", "class endtime 2"]],
+      "link": ["class link 1", "class link 2"]
     }
   },
   "username": "username",
