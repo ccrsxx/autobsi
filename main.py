@@ -188,11 +188,11 @@ def main():
     schedule.every().wednesday.at('07:00').do(job, 'Wednesday')
     schedule.every().thursday.at('07:00').do(job, 'Thursday', 0)
     schedule.every().thursday.at('10:00').do(job, 'Thursday', 1)
-    '''
 
     while True:
         schedule.run_pending()
         time.sleep(1)
+    '''
 
 
 if __name__ == '__main__':
