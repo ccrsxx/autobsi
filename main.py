@@ -110,7 +110,7 @@ def attend_class(mode=get_from_config, mail=False):
             no_class = False
 
     if no_class:
-        logging.info(f'Not in a class schedule now. Will start once class is open.')
+        logging.info(f'Not in a class schedule now.')
 
 def job(day, session=None, verbose=False, mode=get_from_dotenv, mail=True):
     timer = time.time()
