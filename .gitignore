@@ -1,0 +1,15 @@
+# vscode config
+.vscode
+
+# python cache
+__pycache__
+
+# logs and screenshots
+logs
+screenshots
+
+# secret key
+secret
+
+# tests
+start.py

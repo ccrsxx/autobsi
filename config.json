@@ -1,0 +1,28 @@
+{
+  "schedule": {
+    "Monday": {
+      "name": "nama pelajaran",
+      "time": ["start", "end"],
+      "link": "link"
+    },
+    "Tuesday": {
+      "name": "nama pelajaran",
+      "time": ["start", "end"],
+      "link": "link"
+    },
+    "Wednesday": {
+      "name": "nama pelajaran",
+      "time": ["start", "end"],
+      "link": "link"
+    },
+    "Thursday": {
+      "name": ["nama pelajaran", "nama pelajaran2"],
+      "time": [["start1", "end1"], ["start2", "end2"]],
+      "link": ["link1", "link2"]
+    }
+  },
+  "username": "nim",
+  "password": "password",
+  "email": "email",
+  "mail_pass": "password"
+}
