@@ -6,7 +6,7 @@ from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from environment import *
+from environment import get_from_config, get_from_dotenv
 from mail import send_mail
 
 
@@ -121,7 +121,7 @@ def attend_class(mode=get_from_config, mail=False):
     if no_class:
         if next:
             hour, minute = str(datetime.strptime(next, '%H:%M') - datetime.strptime(current_time, '%H:%M')).split(':')[:-1]
-            return logging.info(f'Not in a class schedule now. Next class starts in {hour} hours and {minute} minutes')
+            return logging.info(f'Not in a class schedule now. Next class starts in {hour} hours and {minute} minutes.')
         return logging.info('No more class today.')
 
 
@@ -168,7 +168,7 @@ def job(day, session=None, verbose=False, mode=get_from_dotenv, mail=True):
         logging.info(f'Button Status: {obj.get_button_status()}')
         logging.info('Attempting to push the attendance button...')
         if obj.get_button_status() == 'Belum Mulai':
-            logging.info(f'Waiting 1 min. The class hasn\'t stated yet.')
+            logging.info(f'Waiting 1 min. The class hasn\'t started yet.')
             retry = True
         else:
             obj.click(By.XPATH, obj.attend_locator['ready'])
@@ -186,10 +186,11 @@ def job(day, session=None, verbose=False, mode=get_from_dotenv, mail=True):
 
     obj.driver.close()
 
+    logging.info(f'Automation completed in {time.time() - timer:.0f} seconds')
+
     if mail:
         send_mail(f'Absen {obj.class_name}', f'logs\\{datetime.now().strftime("%d %b")}.txt', img_name, mode)
 
-    logging.info(f'Automation completed in {time.time() - timer:.0f} seconds')
 
 
 def main():
