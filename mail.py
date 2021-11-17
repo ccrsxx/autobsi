@@ -8,9 +8,9 @@ from environment import get_from_config, get_from_dotenv
 
 
 def send_mail(subject, log_path, img_path, mode=get_from_config):
-    with open(img_path, 'rb') as raw_img, open(log_path) as raw_text:
+    with open(img_path, 'rb') as raw_img, open(log_path) as raw_log:
         img = raw_img.read()
-        log = raw_text.read()
+        log = raw_log.read()
 
     msg = MIMEMultipart()
     msg['Subject'] = subject
