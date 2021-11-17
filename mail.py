@@ -9,18 +9,18 @@ from environment import get_from_config, get_from_dotenv
 
 def send_mail(subject, log_path, img_path, mode=get_from_config):
     with open(img_path, 'rb') as raw_img, open(log_path) as raw_text:
-        img_data = raw_img.read()
-        log_path = raw_text.read()
+        img = raw_img.read()
+        log = raw_text.read()
 
     msg = MIMEMultipart()
     msg['Subject'] = subject
     msg['From'] = mode('email')
     msg['To'] = mode('email')
 
-    log_path = MIMEText(log_path)
-    msg.attach(log_path)
+    log = MIMEText(log)
+    msg.attach(log)
 
-    image = MIMEImage(img_data, name=os.path.basename(img_path))
+    image = MIMEImage(img, name=os.path.basename(img_path))
     msg.attach(image)
 
     conn = smtplib.SMTP('smtp.gmail.com', 587)
