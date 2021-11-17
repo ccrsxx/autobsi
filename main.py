@@ -192,7 +192,6 @@ def job(day, session=None, verbose=False, mode=get_from_dotenv, mail=True):
         send_mail(f'Absen {obj.class_name}', f'logs\\{datetime.now().strftime("%d %b")}.txt', img_name, mode)
 
 
-
 def main():
     attend_class(mode=get_from_config, mail=False)
     
