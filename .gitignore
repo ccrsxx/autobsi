@@ -8,7 +8,10 @@ __pycache__
 logs
 screenshots
 
-# secret key
+# virtual environment
+webdriver
+
+# private key
 secret
 
 # tests
