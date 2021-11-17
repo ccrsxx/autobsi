@@ -91,7 +91,7 @@ def attend_class(mode=get_from_config, mail=False):
     if today not in sch:
         return logging.info('No class today.')
 
-    no_class = True
+    next, no_class = '', True
 
     class_schedule = sch[today]['time']
     current_time = datetime.now().strftime('%H:%M')
@@ -103,14 +103,27 @@ def attend_class(mode=get_from_config, mail=False):
                 job(today, session, mode, mail)
                 no_class = False
                 break
+            elif current_time < start:
+                next = start
+                break
+            else:
+                pass
     else:
         start, end = class_schedule
         if start <= current_time < end:
             job(today, mode, mail)
             no_class = False
+        elif current_time < start:
+            next = start
+        else: 
+            pass
 
     if no_class:
-        logging.info(f'Not in a class schedule now.')
+        if next:
+            hour, minute = str(datetime.strptime(next, '%H:%M') - datetime.strptime(current_time, '%H:%M')).split(':')[:-1]
+            return logging.info(f'Not in a class schedule now. Next class starts in {hour} hours and {minute} minutes')
+        return logging.info('No more class today.')
+
 
 def job(day, session=None, verbose=False, mode=get_from_dotenv, mail=True):
     timer = time.time()

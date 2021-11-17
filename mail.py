@@ -35,4 +35,4 @@ def send_mail(subject, text, img_path, mode=get_from_config):
     conn.sendmail(msg['From'], msg['To'], msg.as_string())
     conn.quit()
 
-    logging.info(f'Attendance report sent ✔️ to {msg["to"]}')
+    logging.info(f'Attendance report sent.')
