@@ -91,7 +91,7 @@ def attend_class(mode=get_from_config, mail=False):
     if today not in sch:
         return logging.info('No class today.')
 
-    next, no_class = '', True
+    no_class, next = True, False
 
     class_schedule = sch[today]['time']
     current_time = datetime.now().strftime('%H:%M')
