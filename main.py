@@ -178,7 +178,7 @@ def job(day, session=None, verbose=False, mode=get_from_dotenv, mail=True):
     img_name = obj.save_screenshot()
 
     if obj.get_button_status() == 'Kirim' and obj.get_tab_status() == 'Hadir':
-        logging.info('Automation sucess.')
+        logging.info('Automation success.')
     elif obj.get_button_status() == 'Sudah Selesai':
         logging.info('Class is already over.')
     elif pending:
