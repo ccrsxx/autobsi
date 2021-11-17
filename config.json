@@ -17,7 +17,7 @@
     },
     "Thursday": {
       "name": ["class name 1", "class name 2"],
-      "time": [["class start time 1", "class endtime 2"], ["class start time 1", "class endtime 2"]],
+      "time": [["class start time 1", "class end time 2"], ["class start time 1", "class end time 2"]],
       "link": ["class link 1", "class link 2"]
     }
   },
