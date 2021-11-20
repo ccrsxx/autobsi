@@ -5,9 +5,9 @@ import schedule
 from PIL import Image
 from datetime import datetime
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException
 from environment import get_from_config, get_from_dotenv
 from mail import send_mail
 
@@ -131,10 +131,9 @@ def job(day, session=None, verbose=False, mode=get_from_dotenv, mail=True):
 
     time.sleep(3)
 
-    user = obj.driver.find_element(By.CLASS_NAME, 'user-name')
-    name = obj.driver.find_element(By.ID, 'eMail').get_attribute('value')
-
-    if user.text != mode('username'):
+    try:
+        name = obj.driver.find_element(By.ID, 'eMail').get_attribute('value')
+    except NoSuchElementException:
         logging.info('Either your username or password is wrong. Quitting...')
         quit()
 
