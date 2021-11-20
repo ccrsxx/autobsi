@@ -1,21 +1,15 @@
+import os
 import time
 import logging
 import schedule
 from PIL import Image
 from datetime import datetime
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from environment import get_from_config, get_from_dotenv
 from mail import send_mail
-
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%H:%M:%S',
-                    handlers=[
-                        logging.FileHandler(f'logs\\{datetime.now().strftime("%d %b")}.txt', 'w'), 
-                        logging.StreamHandler()
-                    ]
-)
 
 
 class Base:
@@ -75,7 +69,7 @@ class Attend(Base):
     def get_button_status(self):
         try:
             raw = self.driver.find_element(By.XPATH, self.attend_locator['ready'])
-        except IndexError:
+        except NoSuchElementException:
             raw = self.driver.find_element(By.XPATH, self.attend_locator['not_ready'])
         return raw.text
 
@@ -167,7 +161,7 @@ def job(day, session=None, verbose=False, mode=get_from_dotenv, mail=True):
         logging.info(f'Button Status: {obj.get_button_status()}')
         logging.info('Attempting to push the attendance button...')
         if obj.get_button_status() == 'Belum Mulai':
-            logging.info(f'Waiting 1 min. The class hasn\'t started yet.')
+            logging.info(f'Waiting a min. The class hasn\'t started yet.')
             retry = True
         else:
             obj.click(By.XPATH, obj.attend_locator['ready'])
@@ -194,8 +188,19 @@ def job(day, session=None, verbose=False, mode=get_from_dotenv, mail=True):
 
 
 def main():
-    attend_class(mode=get_from_config, mail=False)
-    
+    for folder in ['logs', 'screenshots']:
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%H:%M:%S',
+                    handlers=[
+                        logging.FileHandler(f'logs\\{datetime.now().strftime("%d %b")}.txt', 'w'), 
+                        logging.StreamHandler()
+                    ]
+    )
+
+    attend_class(mode=get_from_dotenv, mail=False)
+
     '''
     schedule.every().monday.at('07:00').do(job, 'Monday')
     schedule.every().tuesday.at('07:00').do(job, 'Tuesday')
