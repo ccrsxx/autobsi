@@ -99,7 +99,7 @@ def attend_class(mode=get_from_config, mail=False):
     if any(isinstance(nest, list) for nest in class_schedule):
         for session, start, end in enumerate(class_schedule):
             if start <= current_time < end:
-                job(today, session, mode, mail)
+                job(today, session, mode=mode, mail=mail)
                 no_class = False
                 break
             elif current_time < start:
@@ -110,7 +110,7 @@ def attend_class(mode=get_from_config, mail=False):
     else:
         start, end = class_schedule
         if start <= current_time < end:
-            job(today, mode, mail)
+            job(today, mode=mode, mail=mail)
             no_class = False
         elif current_time < start:
             next = start
