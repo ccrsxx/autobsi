@@ -75,7 +75,7 @@ class Attend(Base):
     def get_button_status(self):
         try:
             raw = self.driver.find_element(By.XPATH, self.attend_locator['ready'])
-        except:
+        except IndexError:
             raw = self.driver.find_element(By.XPATH, self.attend_locator['not_ready'])
         return raw.text
 
@@ -97,8 +97,7 @@ def attend_class(mode=get_from_config, mail=False):
     current_time = datetime.now().strftime('%H:%M')
 
     if any(isinstance(nest, list) for nest in class_schedule):
-        for session in range(len(class_schedule)):
-            start, end = class_schedule[session]
+        for session, start, end in enumerate(class_schedule):
             if start <= current_time < end:
                 job(today, session, mode, mail)
                 no_class = False
@@ -126,7 +125,7 @@ def attend_class(mode=get_from_config, mail=False):
 
 
 def job(day, session=None, verbose=False, mode=get_from_dotenv, mail=True):
-    timer = time.time()
+    timer = time.perf_counter()
 
     obj = Attend(day, session, verbose, mode)
 
@@ -178,7 +177,7 @@ def job(day, session=None, verbose=False, mode=get_from_dotenv, mail=True):
     img_name = obj.save_screenshot()
 
     if obj.get_button_status() == 'Kirim' and obj.get_tab_status() == 'Hadir':
-        logging.info('Automation sucess.')
+        logging.info('Automation success.')
     elif obj.get_button_status() == 'Sudah Selesai':
         logging.info('Class is already over.')
     elif pending:
@@ -188,7 +187,7 @@ def job(day, session=None, verbose=False, mode=get_from_dotenv, mail=True):
 
     obj.driver.close()
 
-    logging.info(f'Automation completed in {time.time() - timer:.0f} seconds')
+    logging.info(f'Automation completed in {time.perf_counter() - timer:.0f} seconds')
 
     if mail:
         send_mail(f'Absen {obj.class_name}', f'logs\\{datetime.now().strftime("%d %b")}.txt', img_name, mode)
