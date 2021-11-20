@@ -93,7 +93,7 @@ def attend_class(mode=get_from_config, mail=False):
     if any(isinstance(nest, list) for nest in class_schedule):
         for session, start, end in enumerate(class_schedule):
             if start <= current_time < end:
-                job(today, session, mode=mode, mail=mail)
+                job(today, session, mode, mail)
                 no_class = False
                 break
             elif current_time < start:
@@ -118,7 +118,7 @@ def attend_class(mode=get_from_config, mail=False):
         return logging.info('No more class today.')
 
 
-def job(day, session=None, verbose=False, mode=get_from_dotenv, mail=True):
+def job(day, session=None, mode=get_from_dotenv, mail=True, verbose=False):
     timer = time.perf_counter()
 
     obj = Attend(day, session, verbose, mode)
@@ -198,7 +198,7 @@ def main():
                     ]
     )
 
-    attend_class(mode=get_from_config, mail=False)
+    attend_class(mode=get_from_dotenv, mail=False)
 
     '''
     schedule.every().monday.at('07:00').do(job, 'Monday')
