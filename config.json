@@ -1,21 +1,21 @@
 {
   "schedule": {
-    "Monday": {
+    "monday": {
       "name": "class name",
       "time": ["class start time", "class end time"],
       "link": "class link"
     },
-    "Tuesday": {
+    "tuesday": {
       "name": "class name",
       "time": ["class start time", "class end time"],
       "link": "class link"
     },
-    "Wednesday": {
+    "wednesday": {
       "name": "class name",
       "time": ["class start time", "class end time"],
       "link": "class link"
     },
-    "Thursday": {
+    "thursday": {
       "name": ["class name 1", "class name 2"],
       "time": [["class start time 1", "class end time 2"], ["class start time 1", "class end time 2"]],
       "link": ["class link 1", "class link 2"]

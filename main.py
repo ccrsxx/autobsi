@@ -80,7 +80,7 @@ class Attend(Base):
 
 def attend_class(mode=get_from_config, mail=False):
     sch = mode('schedule')
-    today = datetime.now().strftime('%A')
+    today = datetime.now().strftime('%A').lower()
 
     if today not in sch:
         return logging.info('No class today.')
@@ -198,7 +198,7 @@ def main():
                     ]
     )
 
-    attend_class(mode=get_from_dotenv, mail=False)
+    attend_class(mode=get_from_config, mail=False)
 
     '''
     schedule.every().monday.at('07:00').do(job, 'Monday')
