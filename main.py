@@ -14,7 +14,7 @@ from mail import send_mail
 
 class Base:
 
-    def __init__(self, day, session, verbose, mode):
+    def __init__(self, day, session, mode, verbose):
         options = Options()
         if not verbose: options.add_argument('headless')
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
@@ -44,8 +44,8 @@ class Base:
 
 class Attend(Base):
 
-    def __init__(self, day, session, verbose, mode):
-        super().__init__(day, session, verbose, mode)
+    def __init__(self, day, session, mode, verbose):
+        super().__init__(day, session, mode, verbose)
 
         self.login_url = 'http://elearning.bsi.ac.id/login'
 
@@ -121,7 +121,7 @@ def attend_class(mode=get_from_config, mail=False):
 def job(day, session=None, mode=get_from_dotenv, mail=True, verbose=False):
     timer = time.perf_counter()
 
-    obj = Attend(day, session, verbose, mode)
+    obj = Attend(day, session, mode, verbose)
 
     logging.info(f'Start of program - {obj.class_name}')
     logging.info('Attempting to login...')
