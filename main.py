@@ -78,7 +78,7 @@ class Attend(Base):
         status = [data.split()[1] for data in raw.text.split('\n')][-1]
         return status
 
-def attend_class(mode=get_from_config, mail=False):
+def attend_class(mode=get_from_config, mail=False, verbose=False):
     sch = mode('schedule')
     today = datetime.now().strftime('%A').lower()
 
@@ -93,7 +93,7 @@ def attend_class(mode=get_from_config, mail=False):
     if any(isinstance(nest, list) for nest in class_schedule):
         for session, start, end in enumerate(class_schedule):
             if start <= current_time < end:
-                job(today, session, mode, mail)
+                job(today, session, mode, mail, verbose)
                 no_class = False
                 break
             elif current_time < start:
@@ -104,7 +104,7 @@ def attend_class(mode=get_from_config, mail=False):
     else:
         start, end = class_schedule
         if start <= current_time < end:
-            job(today, mode=mode, mail=mail)
+            job(today, mode=mode, mail=mail, verbose=verbose)
             no_class = False
         elif current_time < start:
             next = start
@@ -198,7 +198,7 @@ def main():
                     ]
     )
 
-    attend_class(mode=get_from_dotenv, mail=False)
+    attend_class(mode=get_from_config, mail=False, verbose=False)
 
     '''
     schedule.every().monday.at('07:00').do(job, 'Monday')
