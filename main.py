@@ -201,11 +201,11 @@ def main():
     attend_class(mode=get_from_config, mail=False, verbose=False)
 
     '''
-    schedule.every().monday.at('07:00').do(job, 'Monday')
-    schedule.every().tuesday.at('07:00').do(job, 'Tuesday')
-    schedule.every().wednesday.at('07:00').do(job, 'Wednesday')
-    schedule.every().thursday.at('07:00').do(job, 'Thursday', 0)
-    schedule.every().thursday.at('10:00').do(job, 'Thursday', 1)
+    schedule.every().monday.at('07:00').do(job, 'monday')
+    schedule.every().tuesday.at('07:00').do(job, 'tuesday')
+    schedule.every().wednesday.at('07:00').do(job, 'wednesday')
+    schedule.every().thursday.at('07:00').do(job, 'thursday', 0)
+    schedule.every().thursday.at('10:00').do(job, 'thursday', 1)
 
     while True:
         schedule.run_pending()
