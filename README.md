@@ -12,7 +12,7 @@ Make sure you have installed all of the following prerequisites on your machine:
 
 - Python - [Download & Install Python](https://nodejs.org/en/download/).
 - Git - [Download & Install Git](https://git-scm.com/downloads).
-- Google Chrome version >= 90
+- Google Chrome version 90 or higher.
 
 ## Setup
 
