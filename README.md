@@ -16,7 +16,7 @@ Make sure you have installed all of the following prerequisites on your machine:
 
 ## Setup
 
-First before doing any of the steps below. You need to set up the `config.json` to allow the script to log in and attend the class.
+First before doing any of the steps below. You need to set up the `config.json` to allow the script to log in and attend the class. Follow these steps:
 
 1. In the schedule section, you can find days for classes that you have to take per week. Change those days based on your schedule. Make sure it's written in English and typed correctly.
 2. Inside the schedule you can find the name, time, and link. The name is for your class name, you can name it whatever you want here. The time is your class schedule, it's a list that consists of when your class starts and ends. Link is the URL of the class that you attend.
