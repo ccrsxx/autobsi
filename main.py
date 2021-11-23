@@ -12,6 +12,14 @@ from environment import get_from_config, get_from_dotenv
 from mail import send_mail
 
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%H:%M:%S',
+                handlers=[
+                    logging.FileHandler(f'logs\\{datetime.now().strftime("%d %b")}.txt', 'w'), 
+                    logging.StreamHandler()
+                ]
+)
+
+
 class Base:
 
     def __init__(self, day, session, mode, verbose):
@@ -118,7 +126,7 @@ def attend_class(mode=get_from_config, mail=False, verbose=False):
         return logging.info('No more class today.')
 
 
-def job(day, session=None, mode=get_from_dotenv, mail=True, verbose=False):
+def job(day, session=None, mode=get_from_config, mail=False, verbose=False):
     timer = time.perf_counter()
 
     obj = Attend(day, session, mode, verbose)
@@ -187,17 +195,6 @@ def job(day, session=None, mode=get_from_dotenv, mail=True, verbose=False):
 
 
 def main():
-    for folder in ['logs', 'screenshots']:
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%H:%M:%S',
-                    handlers=[
-                        logging.FileHandler(f'logs\\{datetime.now().strftime("%d %b")}.txt', 'w'), 
-                        logging.StreamHandler()
-                    ]
-    )
-
     attend_class(mode=get_from_config, mail=False, verbose=False)
 
     '''
