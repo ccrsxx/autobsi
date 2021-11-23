@@ -5,6 +5,7 @@ from urllib.request import urlopen
 from zipfile import ZipFile
 from io import BytesIO
 
+
 def main():
     CHROME_PATHS = [
         os.path.join(os.environ['ProgramFiles'], 'Google\Chrome\Application\Chrome.exe'),
