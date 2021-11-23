@@ -26,7 +26,7 @@ First before doing any of the steps below. You need to set up the `config.json` 
 
 ## Installation
 
-Follow all these steps shown below to use this script.
+Follow all these steps shown below to use the script.
 
 1. Clone this repository. Run:
 
