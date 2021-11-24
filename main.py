@@ -1,4 +1,3 @@
-import os
 import time
 import logging
 import schedule
@@ -126,12 +125,12 @@ def attend_class(mode=get_from_config, mail=False, verbose=False):
         return logging.info('No more class today.')
 
 
-def job(day, session=None, mode=get_from_config, mail=False, verbose=False):
+def job(day, session=None, mode=get_from_dotenv, mail=True, verbose=False):
     timer = time.perf_counter()
 
     obj = Attend(day, session, mode, verbose)
 
-    logging.info(f'Start of program - {obj.class_name}')
+    logging.info(f'{datetime.now().strftime("%A")} - {obj.class_name}')
     logging.info('Attempting to login...')
 
     obj.visit(obj.login_url)
@@ -153,27 +152,31 @@ def job(day, session=None, mode=get_from_config, mail=False, verbose=False):
     time.sleep(3)
 
     attempt, retry, pending = 0, False, False
-    while any(check in ('Absen Masuk', 'Belum Mulai', 'Tidak Hadir') for check in [obj.get_button_status(), obj.get_tab_status()]):
-        if attempt == 100:
-            pending = True
-            break
-        if retry:
-            retry = False
-            time.sleep(60)
-            obj.driver.refresh()
-            time.sleep(3)
-            continue
-        attempt += 1
-        logging.info(f'Attempt {attempt}')
-        logging.info(f'Button Status: {obj.get_button_status()}')
-        logging.info('Attempting to push the attendance button...')
-        if obj.get_button_status() == 'Belum Mulai':
-            logging.info(f'Waiting a min. The class hasn\'t started yet.')
-            retry = True
-        else:
-            obj.click(By.XPATH, obj.attend_locator['ready'])
-            logging.info('Button pushed. Checking...')
-            time.sleep(3)
+
+    try:
+        while any(check in ('Absen Masuk', 'Belum Mulai', 'Tidak Hadir') for check in [obj.get_button_status(), obj.get_tab_status()]):
+            if attempt == 100:
+                pending = True
+                break
+            if retry:
+                retry = False
+                time.sleep(60)
+                obj.driver.refresh()
+                time.sleep(3)
+                continue
+            attempt += 1
+            logging.info(f'Attempt {attempt}')
+            logging.info(f'Button Status: {obj.get_button_status()}')
+            logging.info('Attempting to push the attendance button...')
+            if obj.get_button_status() == 'Belum Mulai':
+                logging.info(f'Waiting a minute. The class hasn\'t started yet.')
+                retry = True
+            else:
+                obj.click(By.XPATH, obj.attend_locator['ready'])
+                logging.info('Button pushed. Checking...')
+                time.sleep(3)
+    except Exception as e:
+        logging.info(f'{e} - while attempting to attend the class')
 
     img_name = obj.save_screenshot()
 

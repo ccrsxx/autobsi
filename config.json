@@ -6,23 +6,23 @@
       "link": "class link"
     },
     "tuesday": {
-      "name": "class name",
-      "time": ["class start time", "class end time"],
-      "link": "class link"
+      "name": "English",
+      "time": ["07:00", "09:00"],
+      "link": "http://elearning.bsi.ac.id/absen-mhs/{your-class-hash}"
     },
     "wednesday": {
-      "name": "class name",
-      "time": ["class start time", "class end time"],
-      "link": "class link"
+      "name": "Magic",
+      "time": ["09:30", "11:00"],
+      "link": "http://elearning.bsi.ac.id/absen-mhs/{your-class-hash}"
     },
     "thursday": {
-      "name": ["class name 1", "class name 2"],
-      "time": [["class start time 1", "class end time 1"], ["class start time 2", "class end time 2"]],
-      "link": ["class link 1", "class link 2"]
+      "name": ["English", "Magic"],
+      "time": [["07:00", "09:00"], ["09:30", "11:00"]],
+      "link": ["http://elearning.bsi.ac.id/absen-mhs/{your-english-class-hash}", "http://elearning.bsi.ac.id/absen-mhs/{your-magic-class-hash}"]
     }
   },
-  "username": "username",
-  "password": "password",
-  "email": "email",
-  "email_app_password": "password"
+  "username": "nim",
+  "password": "mybest password",
+  "email": "email (optional)",
+  "email_app_password": "email api password (optional)"
 }
