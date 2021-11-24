@@ -33,6 +33,7 @@ def main():
             print(f'Created {folder}')
     print('Checking folder done.')
 
+    print('Checking If Google Chrome is installed...')
     for chrome_path in CHROME_PATHS:
         if os.path.exists(chrome_path):
             no_chrome = False
@@ -40,13 +41,14 @@ def main():
 
     if no_chrome:
         return print('Google Chrome is not installed.')
-
-    if chrome_version < 90:
+    elif chrome_version < 90:
         return print('Google Chrome must be at least at version 90 or higher.')
+    else:
+        print(f'Google Chrome version {chrome_version} detected.')
 
     os.chdir(os.path.join(os.path.dirname(sys.executable), 'Scripts'))
 
-    print(f'Downloading webdriver for Google Chrome {chrome_version}...')
+    print(f'Downloading webdriver for Google Chrome version {chrome_version}...')
 
     with ZipFile(BytesIO(urlopen(DRIVER_URLS[chrome_version]).read())) as zip:
         zip.extractall()
