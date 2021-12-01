@@ -6,9 +6,19 @@ from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 from environment import get_from_config, get_from_dotenv
 from mail import send_mail
+
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%H:%M:%S',
+                handlers=[
+                    logging.FileHandler(f'logs\\{datetime.now().strftime("%d %b")}.txt', 'w'), 
+                    logging.StreamHandler()
+                ]
+)
 
 
 class Base:
@@ -32,12 +42,20 @@ class Base:
     def click(self, method, elem):
         self.driver.find_element(method, elem).click()
 
-    def check_path(self, method, elem):
+    def check_element(self, method, elem, error, wait=10, condition=EC.presence_of_element_located):
         try:
-            self.driver.find_element(method, elem)
+            element = WebDriverWait(self.driver, wait).until(condition((method, elem)))
+        except TimeoutException:
+            logging.info(f'{error}. Quitting')
+            return False
+        return element
+
+    def check_exists(self, method, elem):
+        try:
+            element = self.driver.find_element(method, elem)
         except NoSuchElementException:
             return False
-        return True
+        return element
 
     def save_screenshot(self):
         img_name = f'screenshots\\{self.data_log}.png'
@@ -64,17 +82,20 @@ class Attend(Base):
         self.attend_locator = {
             'ready': '/html/body/div[1]/div/div[2]/div/div[5]/div/form/center/button',
             'not_ready': '/html/body/div[1]/div/div[2]/div/div[5]/div/center/button',
-            'presence_tab': '#myTable > tbody'
         }
 
     def login(self):
+        self.visit(self.login_url)
+        self.check_element(By.XPATH, self.login_locator['login_button'], error='Login error.', condition=EC.element_to_be_clickable)
         self.input_keys(By.CSS_SELECTOR, self.login_locator['username_input'], self.username)
         self.input_keys(By.CSS_SELECTOR, self.login_locator['password_input'], self.password)
         self.click(By.XPATH, self.login_locator['login_button'])
 
     def get_button_status(self):
-        if self.check_path(By.XPATH, self.attend_locator['ready']):
-            return self.driver.find_element(By.XPATH, self.attend_locator['ready']).text
+        self.check_element(By.CSS_SELECTOR, '#sidebar', error='Button checking error.')
+        button = self.check_exists(By.XPATH, self.attend_locator['ready'])
+        if button: 
+            return button.text
         return self.driver.find_element(By.XPATH, self.attend_locator['not_ready']).text
 
 
@@ -89,7 +110,6 @@ def attend_class(mode=get_from_config, mail=False, verbose=False):
 
     class_schedule = sch[today]['time']
     current_time = datetime.now().strftime('%H:%M')
-
     if any(isinstance(nest, list) for nest in class_schedule):
         for session, (start, end) in enumerate(class_schedule):
             if start <= current_time < end:
@@ -119,13 +139,6 @@ def attend_class(mode=get_from_config, mail=False, verbose=False):
 
 
 def job(day, session=None, mode=get_from_config, mail=False, verbose=False):
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%H:%M:%S',
-                    handlers=[
-                        logging.FileHandler(f'logs\\{datetime.now().strftime("%d %b")}.txt', 'w'), 
-                        logging.StreamHandler()
-                    ]
-    )
-
     timer = time.perf_counter()
 
     obj = Attend(day, session, mode, verbose)
@@ -133,23 +146,14 @@ def job(day, session=None, mode=get_from_config, mail=False, verbose=False):
     logging.info(f'{datetime.now().strftime("%A")} - {obj.class_name}')
     logging.info('Attempting to login...')
 
-    obj.visit(obj.login_url)
     obj.login()
-
-    time.sleep(3)
-
-    if not obj.check_path(By.ID, 'eMail'):
-        logging.info('Either your username or password is wrong. Quitting...')
-        quit()
-        
-    name = obj.driver.find_element(By.ID, 'eMail').get_attribute('value')
+    
+    name = obj.check_element(By.ID, 'eMail', error='Either your username or password is wrong', wait=5).get_attribute('value')
 
     logging.info(f'Success. Logged in as {name.title()}!')
     logging.info(f'Attempting to attend {obj.class_name}')
 
     obj.visit(obj.class_link)
-
-    time.sleep(3)
 
     attempt, retry, pending = 0, False, False
 
@@ -162,19 +166,17 @@ def job(day, session=None, mode=get_from_config, mail=False, verbose=False):
                 retry = False
                 time.sleep(60)
                 obj.driver.refresh()
-                time.sleep(3)
                 continue
             attempt += 1
             logging.info(f'Attempt {attempt}')
             logging.info(f'Button Status: {obj.get_button_status()}')
-            logging.info('Attempting to push the attendance button...')
             if obj.get_button_status() == 'Belum Mulai':
                 logging.info(f'Waiting a minute. The class hasn\'t started yet.')
                 retry = True
             else:
+                logging.info('Attempting to push the attendance button...')
                 obj.click(By.XPATH, obj.attend_locator['ready'])
                 logging.info('Button pushed. Checking...')
-                time.sleep(3)
     except Exception as e:
         logging.info(f'{e} - while attempting to attend the class')
 
