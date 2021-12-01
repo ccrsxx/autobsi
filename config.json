@@ -1,24 +1,24 @@
 {
   "schedule": {
     "monday": {
-      "name": "class name",
-      "time": ["class start time", "class end time"],
-      "link": "class link"
+      "name": "Literature",
+      "time": ["12:30", "15:00"],
+      "link": "http://elearning.bsi.ac.id/absen-mhs/{your-literature-class-hash}"
     },
     "tuesday": {
       "name": "English",
       "time": ["07:00", "09:00"],
-      "link": "http://elearning.bsi.ac.id/absen-mhs/{your-class-hash}"
+      "link": "http://elearning.bsi.ac.id/absen-mhs/{your-english-class-hash}"
     },
     "wednesday": {
       "name": "Magic",
       "time": ["09:30", "11:00"],
-      "link": "http://elearning.bsi.ac.id/absen-mhs/{your-class-hash}"
+      "link": "http://elearning.bsi.ac.id/absen-mhs/{your-magic-class-hash}"
     },
     "thursday": {
-      "name": ["English", "Magic"],
-      "time": [["07:00", "09:00"], ["09:30", "11:00"]],
-      "link": ["http://elearning.bsi.ac.id/absen-mhs/{your-english-class-hash}", "http://elearning.bsi.ac.id/absen-mhs/{your-magic-class-hash}"]
+      "name": ["Maid", "Dance"],
+      "time": [["15:00", "18:00"], ["19:00", "21:00"]],
+      "link": ["http://elearning.bsi.ac.id/absen-mhs/{your-maid-class-hash}", "http://elearning.bsi.ac.id/absen-mhs/{your-dance-class-hash}"]
     }
   },
   "username": "nim",

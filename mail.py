@@ -1,5 +1,4 @@
 import smtplib
-import logging
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
@@ -28,5 +27,3 @@ def send_mail(subject, log_path, img_path, mode):
     conn.login(mode('email'), mode('email_app_password'))
     conn.sendmail(msg['From'], msg['To'], msg.as_string())
     conn.quit()
-
-    logging.info(f'Attendance report sent.')
