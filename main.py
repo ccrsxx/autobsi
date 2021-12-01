@@ -46,8 +46,8 @@ class Base:
         try:
             element = WebDriverWait(self.driver, wait).until(condition((method, elem)))
         except TimeoutException:
-            logging.info(f'{error}. Quitting')
-            return False
+            logging.info(f'{error}. Quitting...')
+            quit()
         return element
 
     def check_exists(self, method, elem):
