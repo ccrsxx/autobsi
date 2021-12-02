@@ -109,6 +109,7 @@ def attend_class(mode=get_from_config, mail=False, verbose=False):
 
     class_schedule = sch[today]['time']
     current_time = datetime.now().strftime('%H:%M')
+
     if any(isinstance(nest, list) for nest in class_schedule):
         for session, (start, end) in enumerate(class_schedule):
             if start <= current_time < end:
