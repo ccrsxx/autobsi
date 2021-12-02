@@ -24,7 +24,7 @@ First before doing any of the installation. You need to set up the `config.json`
 4. Send the attendance report to your email, **coming soon.**
 5. Run the script automatically when your class starts, **coming soon.**
 
-**Note**: If you have multiple classes a day, you must wrap your class name, time, and link to a list. The time section is always a list, so it's nested inside a list when you have more than one class a day. See the example at Thursday class on the default `config.json`.
+**Note**: If you have multiple classes a day, you will need to wrap your class name, time, and link to a list. The time section is always a list, so it's nested inside a list when you have more than one class a day. See the example at Thursday class on the default `config.json`.
 
 ## Installation
 
