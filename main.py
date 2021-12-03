@@ -92,9 +92,8 @@ class Attend(Base):
 
     def get_button_status(self):
         self.check_element(By.CSS_SELECTOR, '#sidebar', error='Button checking error.')
-        button = self.check_exists(By.XPATH, self.attend_locator['ready'])
-        if button: 
-            return button.text
+        if ready := self.check_exists(By.XPATH, self.attend_locator['ready']): 
+            return ready.text
         return self.driver.find_element(By.XPATH, self.attend_locator['not_ready']).text
 
 
