@@ -1,5 +1,6 @@
 # Auto Attend MyBest BSI
 
+![Build](https://github.com/ccrsxx/autobsi/actions/workflows/codeql-analysis.yml/badge.svg)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ## About
