@@ -21,7 +21,7 @@ def main():
         94: 'https://chromedriver.storage.googleapis.com/94.0.4606.113/chromedriver_win32.zip',
         95: 'https://chromedriver.storage.googleapis.com/95.0.4638.69/chromedriver_win32.zip',
         96: 'https://chromedriver.storage.googleapis.com/96.0.4664.45/chromedriver_win32.zip',
-        97: 'https://chromedriver.storage.googleapis.com/97.0.4692.20/chromedriver_win32.zip',
+        97: 'https://chromedriver.storage.googleapis.com/97.0.4692.20/chromedriver_win32.zip'
     }
 
     no_chrome = True

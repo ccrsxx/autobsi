@@ -9,8 +9,8 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from scripts import get_from_config, get_from_dotenv
-from scripts import send_mail
+from environment import get_from_config, get_from_dotenv
+from mail import send_mail
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%H:%M:%S',

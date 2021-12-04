@@ -17,8 +17,14 @@
     },
     "thursday": {
       "name": ["Maid", "Dance"],
-      "time": [["15:00", "18:00"], ["19:00", "21:00"]],
-      "link": ["http://elearning.bsi.ac.id/absen-mhs/{your-maid-class-hash}", "http://elearning.bsi.ac.id/absen-mhs/{your-dance-class-hash}"]
+      "time": [
+        ["15:00", "18:00"],
+        ["19:00", "21:00"]
+      ],
+      "link": [
+        "http://elearning.bsi.ac.id/absen-mhs/{your-maid-class-hash}",
+        "http://elearning.bsi.ac.id/absen-mhs/{your-dance-class-hash}"
+      ]
     }
   },
   "username": "nim",
