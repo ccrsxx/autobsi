@@ -7,6 +7,8 @@ from io import BytesIO
 
 
 def main():
+    os.chdir(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'src'))
+
     CHROME_PATHS = [
         os.path.join(os.environ['ProgramFiles'], 'Google\Chrome\Application\Chrome.exe'),
         os.path.join(os.environ['ProgramFiles(x86)'], 'Google\Chrome\Application\Chrome.exe'),

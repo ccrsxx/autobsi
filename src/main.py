@@ -1,3 +1,4 @@
+import os
 import time
 import logging
 import schedule
@@ -6,19 +7,11 @@ from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from environment import get_from_config, get_from_dotenv
 from mail import send_mail
-
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%H:%M:%S',
-                handlers=[
-                    logging.FileHandler(f'logs\\{datetime.now().strftime("%d %b")}.txt', 'w'), 
-                    logging.StreamHandler()
-                ]
-)
 
 
 class Base:
@@ -57,7 +50,7 @@ class Base:
         return element
 
     def save_screenshot(self):
-        img_name = f'screenshots\\{self.data_log}.png'
+        img_name = os.path.join('screenshots', f'{self.data_log}.png')
         self.driver.set_window_size(1920, 1080)
         self.driver.find_element(By.TAG_NAME, 'body').screenshot(img_name) 
         self.driver.get_screenshot_as_file(img_name)
@@ -195,12 +188,20 @@ def job(day, session=None, mode=get_from_config, mail=False, verbose=False):
     logging.info(f'Automation completed in {time.perf_counter() - timer:.0f} seconds')
 
     if mail:
-        send_mail(f'Attendance Report - {obj.class_name}', f'logs\\{datetime.now().strftime("%d %b")}.txt', img_name, mode)
-
-    logging.info(f'Attendance report sent.')
+        send_mail(f'Attendance Report - {obj.class_name}', os.path.join('logs', f'{datetime.now().strftime("%d %b")}.txt'), img_name, mode)
+        logging.info(f'Attendance report sent.')
 
 
 def main():
+    os.chdir(os.path.dirname(os.path.realpath(__file__)))
+
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%H:%M:%S',
+                    handlers=[
+                        logging.FileHandler(os.path.join('logs', f'{datetime.now().strftime("%d %b")}.txt')),
+                        logging.StreamHandler()
+                    ]
+    )
+
     attend_class(mode=get_from_config, mail=False, verbose=False)
 
     '''
