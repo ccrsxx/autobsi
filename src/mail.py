@@ -1,3 +1,4 @@
+import os
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
@@ -5,6 +6,7 @@ from email.mime.multipart import MIMEMultipart
 
 
 def send_mail(subject, log_path, img_path, mode):
+    print(log_path)
     with open(img_path, 'rb') as raw_img, open(log_path) as raw_log:
         img = raw_img.read()
         log = raw_log.read()
@@ -17,7 +19,7 @@ def send_mail(subject, log_path, img_path, mode):
     log = MIMEText(log)
     msg.attach(log)
 
-    image = MIMEImage(img, name=img_path.split('\\')[-1])
+    image = MIMEImage(img, name=os.path.basename(img_path))
     msg.attach(image)
 
     conn = smtplib.SMTP('smtp.gmail.com', 587)

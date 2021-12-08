@@ -97,7 +97,7 @@ def attend_class(mode=get_from_config, mail=False, verbose=False):
     if today not in sch:
         return logging.info('No class today.')
 
-    no_class, next = True, False
+    next_class = False
 
     class_schedule = sch[today]['time']
     current_time = datetime.now().strftime('%H:%M')
@@ -106,10 +106,9 @@ def attend_class(mode=get_from_config, mail=False, verbose=False):
         for session, (start, end) in enumerate(class_schedule):
             if start <= current_time < end:
                 job(today, session, mode, mail, verbose)
-                no_class = False
                 break
             elif current_time < start:
-                next = start
+                next_class = start
                 break
             else:
                 pass
@@ -117,17 +116,15 @@ def attend_class(mode=get_from_config, mail=False, verbose=False):
         start, end = class_schedule
         if start <= current_time < end:
             job(today, mode=mode, mail=mail, verbose=verbose)
-            no_class = False
         elif current_time < start:
-            next = start
+            next_class = start
         else: 
             pass
 
-    if no_class:
-        if next:
-            hour, minute = str(datetime.strptime(next, '%H:%M') - datetime.strptime(current_time, '%H:%M')).split(':')[:-1]
-            return logging.info(f'Not in a class schedule now. Next class starts in {hour} hours and {minute} minutes.')
-        return logging.info('No more class today.')
+    if next_class:
+        hour, minute = str(datetime.strptime(next_class, '%H:%M') - datetime.strptime(current_time, '%H:%M')).split(':')[:-1]
+        return logging.info(f'Not in a class schedule now. Next class starts in {hour} hours and {minute} minutes.')
+    return logging.info('No more class today.')
 
 
 def job(day, session=None, mode=get_from_config, mail=False, verbose=False):
@@ -188,7 +185,7 @@ def job(day, session=None, mode=get_from_config, mail=False, verbose=False):
     logging.info(f'Automation completed in {time.perf_counter() - timer:.0f} seconds')
 
     if mail:
-        send_mail(f'Attendance Report - {obj.class_name}', os.path.join('logs', f'{datetime.now().strftime("%d %b")}.txt'), img_name, mode)
+        send_mail(f'Attendance Report - {obj.class_name}', os.path.join('logs', f'{obj.data_log.split(" - ")[0]}.txt'), img_name, mode)
         logging.info(f'Attendance report sent.')
 
 
