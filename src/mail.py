@@ -6,7 +6,6 @@ from email.mime.multipart import MIMEMultipart
 
 
 def send_mail(subject, log_path, img_path, mode):
-    print(log_path)
     with open(img_path, 'rb') as raw_img, open(log_path) as raw_log:
         img = raw_img.read()
         log = raw_log.read()
