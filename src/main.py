@@ -52,7 +52,7 @@ class Base:
     def save_screenshot(self):
         img_name = os.path.join('screenshots', f'{self.data_log}.png')
         self.driver.set_window_size(1920, 1080)
-        self.driver.find_element(By.TAG_NAME, 'body').screenshot(img_name) 
+        self.driver.find_element(By.TAG_NAME, 'body').screenshot(img_name)
         self.driver.get_screenshot_as_file(img_name)
         Image.open(img_name).crop((80, 100, 1900, 330)).save(img_name)
         return img_name
@@ -85,9 +85,27 @@ class Attend(Base):
 
     def get_button_status(self):
         self.check_element(By.CSS_SELECTOR, '#sidebar', error='Button checking error.')
-        if ready := self.check_exists(By.XPATH, self.attend_locator['ready']): 
+        if ready := self.check_exists(By.XPATH, self.attend_locator['ready']):
             return ready.text
         return self.driver.find_element(By.XPATH, self.attend_locator['not_ready']).text
+
+    def check_next_class(self):
+        current_time, today = datetime.now().strftime('%H:%M'), datetime.now().strftime('%A').lower()
+        class_schedule = self.sch[today]['time']
+
+        next_class = False
+
+        if any(isinstance(nest, list) for nest in class_schedule):
+            for start, _ in class_schedule:
+                if current_time < start:
+                    next_class = start
+                    break
+
+        if next_class:
+            hour, minute = str(datetime.strptime(next_class, '%H:%M') - datetime.strptime(current_time, '%H:%M')).split(':')[:-1]
+            return logging.info(f'Not in a class schedule now. Next class starts in {hour} hours and {minute} minutes.')
+
+        return logging.info('No more class today.')
 
 
 def attend_class(mode=get_from_config, mail=False, verbose=False):
@@ -110,21 +128,16 @@ def attend_class(mode=get_from_config, mail=False, verbose=False):
             elif current_time < start:
                 next_class = start
                 break
-            else:
-                pass
     else:
         start, end = class_schedule
         if start <= current_time < end:
             job(today, mode=mode, mail=mail, verbose=verbose)
         elif current_time < start:
             next_class = start
-        else: 
-            pass
 
     if next_class:
         hour, minute = str(datetime.strptime(next_class, '%H:%M') - datetime.strptime(current_time, '%H:%M')).split(':')[:-1]
         return logging.info(f'Not in a class schedule now. Next class starts in {hour} hours and {minute} minutes.')
-    return logging.info('No more class today.')
 
 
 def job(day, session=None, mode=get_from_config, mail=False, verbose=False):
@@ -136,7 +149,7 @@ def job(day, session=None, mode=get_from_config, mail=False, verbose=False):
     logging.info('Attempting to login...')
 
     obj.login()
-    
+
     name = obj.check_element(By.ID, 'eMail', error='Either your username or password is wrong', wait=5).get_attribute('value')
 
     logging.info(f'Success. Logged in as {name.title()}!')
@@ -147,7 +160,7 @@ def job(day, session=None, mode=get_from_config, mail=False, verbose=False):
     attempt, retry, pending = 0, False, False
 
     try:
-        while obj.get_button_status() in ('Absen Masuk', 'Belum Mulai'):
+        while obj.get_button_status() in ['Absen Masuk', 'Belum Mulai']:
             if attempt == 100:
                 pending = True
                 break
@@ -187,6 +200,8 @@ def job(day, session=None, mode=get_from_config, mail=False, verbose=False):
     if mail:
         send_mail(f'Attendance Report - {obj.class_name}', os.path.join('logs', f'{obj.data_log.split(" - ")[0]}.txt'), img_name, mode)
         logging.info(f'Attendance report sent.')
+
+    obj.check_next_class()
 
 
 def main():
