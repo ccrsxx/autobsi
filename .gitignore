@@ -3,10 +3,11 @@
 
 # python cache
 __pycache__
+.mypy_cache
 
 # logs and screenshots
-logs
-screenshots
+src/logs
+src/screenshots
 
 # virtual environment
 webdriver

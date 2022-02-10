@@ -2,3 +2,5 @@
 
 __author__ = """ccrsxx"""
 __version__ = '1.0'
+
+from .autobsi import *
