@@ -7,8 +7,10 @@ from io import BytesIO
 
 CHROME_PATHS = [
     os.path.join(os.environ['ProgramFiles'], 'Google\Chrome\Application\Chrome.exe'),
-    os.path.join(os.environ['ProgramFiles(x86)'], 'Google\Chrome\Application\Chrome.exe'),
-    os.path.join(os.environ['LocalAppData'], 'Google\Chrome\Application\Chrome.exe')
+    os.path.join(
+        os.environ['ProgramFiles(x86)'], 'Google\Chrome\Application\Chrome.exe'
+    ),
+    os.path.join(os.environ['LocalAppData'], 'Google\Chrome\Application\Chrome.exe'),
 ]
 
 DRIVER_URLS = {
@@ -21,7 +23,7 @@ DRIVER_URLS = {
     96: 'https://chromedriver.storage.googleapis.com/96.0.4664.45/chromedriver_win32.zip',
     97: 'https://chromedriver.storage.googleapis.com/97.0.4692.20/chromedriver_win32.zip',
     98: 'https://chromedriver.storage.googleapis.com/98.0.4758.80/chromedriver_win32.zip',
-    99: 'https://chromedriver.storage.googleapis.com/99.0.4844.17/chromedriver_win32.zip'
+    99: 'https://chromedriver.storage.googleapis.com/99.0.4844.17/chromedriver_win32.zip',
 }
 
 
@@ -41,7 +43,9 @@ def main():
     for chrome_path in CHROME_PATHS:
         if os.path.exists(chrome_path):
             no_chrome = False
-            chrome_version = HIWORD(GetFileVersionInfo(chrome_path, '\\')['FileVersionMS'])
+            chrome_version = HIWORD(
+                GetFileVersionInfo(chrome_path, '\\')['FileVersionMS']
+            )
 
     if no_chrome:
         return print('Google Chrome is not installed.')

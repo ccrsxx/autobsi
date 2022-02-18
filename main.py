@@ -4,12 +4,17 @@ from src import *
 def main():
     os.chdir(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'src'))
 
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%H:%M:%S',
-                        handlers=[
-                            logging.FileHandler(os.path.join('logs', f'{datetime.now().strftime("%d %b")}.txt')),
-                            logging.StreamHandler()
-                        ]
-                        )
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(message)s',
+        datefmt='%H:%M:%S',
+        handlers=[
+            logging.FileHandler(
+                os.path.join('logs', f'{datetime.now().strftime("%d %b")}.txt')
+            ),
+            logging.StreamHandler(),
+        ],
+    )
 
     attend_class()
 

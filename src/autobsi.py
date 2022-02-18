@@ -15,16 +15,27 @@ from .mail import send_mail
 
 
 class Base:
-
     def __init__(self, day, session, mode, verbose):
         options = Options()
         if not verbose:
             options.add_argument('headless')
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
         self.driver = webdriver.Chrome(options=options, service_log_path='NUL')
-        self.sch, self.username, self.password = mode('schedule'), mode('username'), mode('password')
-        self.class_name = self.sch[day]['name'][session] if session is not None else self.sch[day]['name']
-        self.class_link = self.sch[day]['link'][session] if session is not None else self.sch[day]['link']
+        self.sch, self.username, self.password = (
+            mode('schedule'),
+            mode('username'),
+            mode('password'),
+        )
+        self.class_name = (
+            self.sch[day]['name'][session]
+            if session is not None
+            else self.sch[day]['name']
+        )
+        self.class_link = (
+            self.sch[day]['link'][session]
+            if session is not None
+            else self.sch[day]['link']
+        )
         self.data_log = f'{datetime.now().strftime("%d %b")} - {self.class_name}'
 
     def visit(self, url):
@@ -36,7 +47,9 @@ class Base:
     def click(self, method, elem):
         self.driver.find_element(method, elem).click()
 
-    def check_element(self, method, elem, error, wait=10, condition=EC.presence_of_element_located):
+    def check_element(
+        self, method, elem, error, wait=10, condition=EC.presence_of_element_located
+    ):
         try:
             element = WebDriverWait(self.driver, wait).until(condition((method, elem)))
         except TimeoutException:
@@ -60,7 +73,6 @@ class Base:
 
 
 class Attend(Base):
-
     def __init__(self, day, session, mode, verbose):
         super().__init__(day, session, mode, verbose)
 
@@ -69,7 +81,7 @@ class Attend(Base):
         self.login_locator = {
             'username_input': '#username',
             'password_input': '#password',
-            'login_button': '/html/body/div/div/div/div[2]/div/div[2]/form/div[3]/button'
+            'login_button': '/html/body/div/div/div/div[2]/div/div[2]/form/div[3]/button',
         }
 
         self.attend_locator = {
@@ -79,9 +91,18 @@ class Attend(Base):
 
     def login(self):
         self.visit(self.login_url)
-        self.check_element(By.XPATH, self.login_locator['login_button'], error='Login error', condition=EC.element_to_be_clickable)
-        self.input_keys(By.CSS_SELECTOR, self.login_locator['username_input'], self.username)
-        self.input_keys(By.CSS_SELECTOR, self.login_locator['password_input'], self.password)
+        self.check_element(
+            By.XPATH,
+            self.login_locator['login_button'],
+            error='Login error',
+            condition=EC.element_to_be_clickable,
+        )
+        self.input_keys(
+            By.CSS_SELECTOR, self.login_locator['username_input'], self.username
+        )
+        self.input_keys(
+            By.CSS_SELECTOR, self.login_locator['password_input'], self.password
+        )
         self.click(By.XPATH, self.login_locator['login_button'])
 
     def get_button_status(self):
@@ -91,7 +112,10 @@ class Attend(Base):
         return self.driver.find_element(By.XPATH, self.attend_locator['not_ready']).text
 
     def check_next_class(self):
-        current_time, today = datetime.now().strftime('%H:%M'), datetime.now().strftime('%A').lower()
+        current_time, today = (
+            datetime.now().strftime('%H:%M'),
+            datetime.now().strftime('%A').lower(),
+        )
         class_schedule = self.sch[today]['time']
 
         next_class = False
@@ -103,20 +127,27 @@ class Attend(Base):
                     break
 
         if next_class:
-            hour, minute = str(datetime.strptime(next_class, '%H:%M') - datetime.strptime(current_time, '%H:%M')).split(':')[:-1]
-            return logging.info(f'Not in a class schedule now. Next class starts in {hour} hours and {minute} minutes')
+            hour, minute = str(
+                datetime.strptime(next_class, '%H:%M')
+                - datetime.strptime(current_time, '%H:%M')
+            ).split(':')[:-1]
+            return logging.info(
+                f'Not in a class schedule now. Next class starts in {hour} hours and {minute} minutes'
+            )
 
         return logging.info('No more class today')
 
 
-def attend_class(mode: Callable = get_from_config, mail: bool = False, verbose: bool = False):
+def attend_class(
+    mode: Callable = get_from_config, mail: bool = False, verbose: bool = False
+):
     sch = mode('schedule')
     today = datetime.now().strftime('%A').lower()
 
     if today not in sch:
         return logging.info('No class today')
 
-    next_class: bool | str = False
+    next_class = False
 
     class_schedule = sch[today]['time']
     current_time = datetime.now().strftime('%H:%M')
@@ -137,11 +168,22 @@ def attend_class(mode: Callable = get_from_config, mail: bool = False, verbose: 
             next_class = start
 
     if next_class:
-        hour, minute = str(datetime.strptime(next_class, '%H:%M') - datetime.strptime(current_time, '%H:%M')).split(':')[:-1]  # type: ignore
-        return logging.info(f'Not in a class schedule now. Next class starts in {hour} hours and {minute} minutes')
+        hour, minute = str(
+            datetime.strptime(next_class, '%H:%M')  # type: ignore
+            - datetime.strptime(current_time, '%H:%M')
+        ).split(':')[:-1]
+        return logging.info(
+            f'Not in a class schedule now. Next class starts in {hour} hours and {minute} minutes'
+        )
 
 
-def job(day: str, session: int = None, mode: Callable = get_from_config, mail: bool = False, verbose: bool = False):
+def job(
+    day: str,
+    session: int = None,
+    mode: Callable = get_from_config,
+    mail: bool = False,
+    verbose: bool = False,
+):
     timer = time.perf_counter()
 
     driver = Attend(day, session, mode, verbose)
@@ -153,7 +195,9 @@ def job(day: str, session: int = None, mode: Callable = get_from_config, mail: b
 
     try:
         driver.login()
-        name = driver.check_element(By.ID, 'eMail', error='Either your username or password is wrong', wait=5).get_attribute('value')
+        name = driver.check_element(
+            By.ID, 'eMail', error='Either your username or password is wrong', wait=5
+        ).get_attribute('value')
     except Exception as e:
         error = True
         logging.error(f'{e} - while logging in')
@@ -208,5 +252,10 @@ def job(day: str, session: int = None, mode: Callable = get_from_config, mail: b
     driver.check_next_class()
 
     if mail:
-        send_mail(f'Attendance Report - {driver.class_name}', os.path.join('logs', f'{driver.data_log.split(" - ")[0]}.txt'), img_name, mode)
+        send_mail(
+            f'Attendance Report - {driver.class_name}',
+            os.path.join('logs', f'{driver.data_log.split(" - ")[0]}.txt'),
+            img_name,
+            mode,
+        )
         logging.info(f'Attendance report sent')
