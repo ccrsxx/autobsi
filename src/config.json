@@ -1,5 +1,5 @@
 {
-  "schedule": {
+  "timetable": {
     "monday": {
       "name": "Literature",
       "time": ["12:30", "15:00"],

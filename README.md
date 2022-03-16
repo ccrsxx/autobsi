@@ -20,8 +20,8 @@ Make sure you have installed all of the following prerequisites on your machine:
 
 First before doing any of the installation. You need to set up the `config.json` to allow the script to log in and attend the class. Follow these steps:
 
-1. In the schedule section, you can find days for classes that you have to take per week. Change those days based on your schedule. Make sure it's written in English and typed correctly.
-2. Inside the schedule you can find the name, time, and link. The name is for your class name, you can name it whatever you want here. The time is your class schedule, it's a list that consists of when your class starts and ends, it's formatted as 'HH:MM' i.e '12:30'. The link is the URL of the class that you attend, you can get it on MyBest in your class attendance section.
+1. In the timetable section, you can find days for classes that you have to take per week. Change those days based on your schedule. Make sure it's written in English and typed correctly.
+2. Inside the timetable you can find the name, time, and link. The name is for your class name, you can name it whatever you want here. The time is your class schedule, it's a list that consists of when your class starts and ends, it's formatted as 'HH:MM' i.e '12:30'. The link is the URL of the class that you attend, you can get it on MyBest in your class attendance section.
 3. The last section is username (nim) and password. This data is used to allow the script to log in to your MyBest Account.
 4. Send the attendance report to your email, **coming soon.**
 5. Run the script automatically when your class starts, **coming soon.**

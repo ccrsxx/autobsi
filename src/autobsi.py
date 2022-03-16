@@ -71,7 +71,7 @@ class Attend(Base):
     ):
         super().__init__(verbose)
         (
-            self.sch,
+            self.timetable,
             self.username,
             self.password,
             self.login_url,
@@ -80,7 +80,7 @@ class Attend(Base):
         ) = [
             get(key)
             for key in [
-                'schedule',
+                'timetable',
                 'username',
                 'password',
                 'login_url',
@@ -88,37 +88,31 @@ class Attend(Base):
                 'attend_locator',
             ]
         ]
-        self.class_name = (
-            self.sch[day]['name'][session]
+        self.class_name, self.class_link = [
+            self.timetable[day][key][session]
             if session is not None
-            else self.sch[day]['name']
-        )
-        self.class_link = (
-            self.sch[day]['link'][session]
-            if session is not None
-            else self.sch[day]['link']
-        )
+            else self.timetable[day][key]
+            for key in ['name', 'link']
+        ]
         self.data_log = f'{datetime.now().strftime("%d %b")} - {self.class_name}'
-
-        log_name = f'{self.data_log.split(" - ")[0]}.txt'
-
-        if log_name in os.listdir('logs'):
-            open(os.path.join('logs', log_name), 'w').close()
 
     def login(self):
         self.visit(self.login_url)
+
         self.check_element(
             By.XPATH,
             self.login_locator['login_button'],
             error='Login error',
             condition=EC.element_to_be_clickable,
         )
-        self.input_keys(
-            By.CSS_SELECTOR, self.login_locator['username_input'], self.username
-        )
-        self.input_keys(
-            By.CSS_SELECTOR, self.login_locator['password_input'], self.password
-        )
+
+        for key in self.login_locator:
+            self.input_keys(
+                By.CSS_SELECTOR,
+                self.login_locator[key],
+                getattr(self, key.split('_')[0]),
+            )
+
         self.click(By.XPATH, self.login_locator['login_button'])
 
     def get_button_status(self):
@@ -132,12 +126,12 @@ class Attend(Base):
             datetime.now().strftime('%H:%M'),
             datetime.now().strftime('%A').lower(),
         )
-        class_schedule = self.sch[today]['time']
 
+        class_timetable = self.timetable[today]['time']
         next_class = False
 
-        if any(isinstance(nest, list) for nest in class_schedule):
-            for start, _ in class_schedule:
+        if any(isinstance(nest, list) for nest in class_timetable):
+            for start, _ in class_timetable:
                 if current_time < start:
                     next_class = start
                     break
@@ -148,7 +142,7 @@ class Attend(Base):
                 - datetime.strptime(current_time, '%H:%M')
             ).split(':')[:-1]
             return logging.info(
-                f'Not in a class schedule now. Next class starts in {hour} hours and {minute} minutes'
+                f'Next class starts in {hour} hours and {minute} minutes'
             )
 
         return logging.info('No more class today')
@@ -159,19 +153,19 @@ def attend_class(
     mail: bool = False,
     verbose: bool = False,
 ):
-    sch = get('schedule')
+    timetable = get('timetable')
     today = datetime.now().strftime('%A').lower()
 
-    if today not in sch:
+    if today not in timetable:
         return logging.info('No class today')
 
     next_class = False
 
-    class_schedule = sch[today]['time']
+    class_timetable = timetable[today]['time']
     current_time = datetime.now().strftime('%H:%M')
 
-    if any(isinstance(nest, list) for nest in class_schedule):
-        for session, (start, end) in enumerate(class_schedule):
+    if any(isinstance(nest, list) for nest in class_timetable):
+        for session, (start, end) in enumerate(class_timetable):
             if start <= current_time < end:
                 job(today, session, get, mail, verbose)
                 break
@@ -179,7 +173,7 @@ def attend_class(
                 next_class = start
                 break
     else:
-        start, end = class_schedule
+        start, end = class_timetable
         if start <= current_time < end:
             job(today, get=get, mail=mail, verbose=verbose)
         elif current_time < start:
@@ -190,9 +184,7 @@ def attend_class(
             datetime.strptime(next_class, '%H:%M')  # type: ignore
             - datetime.strptime(current_time, '%H:%M')
         ).split(':')[:-1]
-        return logging.info(
-            f'Not in a class schedule now. Next class starts in {hour} hours and {minute} minutes'
-        )
+        return logging.info(f'Next class starts in {hour} hours and {minute} minutes')
 
 
 def job(
