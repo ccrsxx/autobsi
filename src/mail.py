@@ -1,12 +1,16 @@
 import os
 import smtplib
+
+from typing import Callable
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 
 
-def send_mail(subject, log_path, img_path, get):
-    email, api_key, target_email = get('email'), get('api_key'), get('target_email')
+def send_mail(subject: str, log_path: str, img_path: str, get: Callable):
+    email, api_key, target_email = [
+        get(key) for key in ['email', 'api_key', 'target_email']
+    ]
 
     with open(img_path, 'rb') as raw_img, open(log_path) as raw_log:
         img = raw_img.read()
@@ -17,8 +21,8 @@ def send_mail(subject, log_path, img_path, get):
     msg['From'] = get('email')
     msg['To'] = get('email')
 
-    log = MIMEText(log)
-    msg.attach(log)
+    log = MIMEText(log)  # type: ignore
+    msg.attach(log)  # type: ignore
 
     image = MIMEImage(img, name=os.path.basename(img_path))
     msg.attach(image)

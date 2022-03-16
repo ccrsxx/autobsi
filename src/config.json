@@ -27,6 +27,11 @@
       ]
     }
   },
+  "username": "nim",
+  "password": "mybest password",
+  "email": "email (optional)",
+  "api_key": "email api_key (optional)",
+  "target_email": "target email (optional)",
   "login_url": "http://elearning.bsi.ac.id/login",
   "login_locator": {
     "username_input": "#username",
@@ -36,10 +41,5 @@
   "attend_locator": {
     "ready": "/html/body/div[1]/div/div[2]/div/div[5]/div/form/center/button",
     "not_ready": "/html/body/div[1]/div/div[2]/div/div[5]/div/center/button"
-  },
-  "username": "nim",
-  "password": "mybest password",
-  "email": "email (optional)",
-  "api_key": "email api_key (optional)",
-  "target_email": "target email (optional)"
+  }
 }
