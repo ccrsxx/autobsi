@@ -2,7 +2,7 @@ import os
 import time
 import logging
 from PIL import Image
-from typing import Callable
+from typing import Type, Callable
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -15,40 +15,29 @@ from .mail import send_mail
 
 
 class Base:
-    def __init__(self, day, session, mode, verbose):
+    def __init__(self, verbose: bool):
         options = Options()
         if not verbose:
             options.add_argument('headless')
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
         self.driver = webdriver.Chrome(options=options, service_log_path='NUL')
-        self.sch, self.username, self.password = (
-            mode('schedule'),
-            mode('username'),
-            mode('password'),
-        )
-        self.class_name = (
-            self.sch[day]['name'][session]
-            if session is not None
-            else self.sch[day]['name']
-        )
-        self.class_link = (
-            self.sch[day]['link'][session]
-            if session is not None
-            else self.sch[day]['link']
-        )
-        self.data_log = f'{datetime.now().strftime("%d %b")} - {self.class_name}'
 
-    def visit(self, url):
+    def visit(self, url: str):
         self.driver.get(url)
 
-    def input_keys(self, method, elem, keys):
+    def input_keys(self, method: By, elem: str, keys: str):
         self.driver.find_element(method, elem).send_keys(keys)
 
-    def click(self, method, elem):
+    def click(self, method: By, elem: str):
         self.driver.find_element(method, elem).click()
 
     def check_element(
-        self, method, elem, error, wait=10, condition=EC.presence_of_element_located
+        self,
+        method: By,
+        elem: str,
+        error: str,
+        wait: int = 10,
+        condition: Type = EC.presence_of_element_located,
     ):
         try:
             element = WebDriverWait(self.driver, wait).until(condition((method, elem)))
@@ -56,7 +45,7 @@ class Base:
             raise Exception(error)
         return element
 
-    def check_exists(self, method, elem):
+    def check_exists(self, method: By, elem: str):
         try:
             element = self.driver.find_element(method, elem)
         except NoSuchElementException:
@@ -73,21 +62,48 @@ class Base:
 
 
 class Attend(Base):
-    def __init__(self, day, session, mode, verbose):
-        super().__init__(day, session, mode, verbose)
+    def __init__(
+        self,
+        day: str,
+        session: None | int,
+        mode: Callable,
+        verbose: bool,
+    ):
+        super().__init__(verbose)
+        (
+            self.sch,
+            self.username,
+            self.password,
+            self.login_url,
+            self.login_locator,
+            self.attend_locator,
+        ) = [
+            mode(key)
+            for key in [
+                'schedule',
+                'username',
+                'password',
+                'login_url',
+                'login_locator',
+                'attend_locator',
+            ]
+        ]
+        self.class_name = (
+            self.sch[day]['name'][session]
+            if session is not None
+            else self.sch[day]['name']
+        )
+        self.class_link = (
+            self.sch[day]['link'][session]
+            if session is not None
+            else self.sch[day]['link']
+        )
+        self.data_log = f'{datetime.now().strftime("%d %b")} - {self.class_name}'
 
-        self.login_url = 'http://elearning.bsi.ac.id/login'
+        log_name = f'{self.data_log.split(" - ")[0]}.txt'
 
-        self.login_locator = {
-            'username_input': '#username',
-            'password_input': '#password',
-            'login_button': '/html/body/div/div/div/div[2]/div/div[2]/form/div[3]/button',
-        }
-
-        self.attend_locator = {
-            'ready': '/html/body/div[1]/div/div[2]/div/div[5]/div/form/center/button',
-            'not_ready': '/html/body/div[1]/div/div[2]/div/div[5]/div/center/button',
-        }
+        if log_name in os.listdir('logs'):
+            open(os.path.join('logs', log_name), 'w').close()
 
     def login(self):
         self.visit(self.login_url)
@@ -179,7 +195,7 @@ def attend_class(
 
 def job(
     day: str,
-    session: int = None,
+    session: None | int = None,
     mode: Callable = get_from_dotenv,
     mail: bool = True,
     verbose: bool = False,

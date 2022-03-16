@@ -27,6 +27,16 @@
       ]
     }
   },
+  "login_url": "http://elearning.bsi.ac.id/login",
+  "login_locator": {
+    "username_input": "#username",
+    "password_input": "#password",
+    "login_button": "/html/body/div/div/div/div[2]/div/div[2]/form/div[3]/button"
+  },
+  "attend_locator": {
+    "ready": "/html/body/div[1]/div/div[2]/div/div[5]/div/form/center/button",
+    "not_ready": "/html/body/div[1]/div/div[2]/div/div[5]/div/center/button"
+  },
   "username": "nim",
   "password": "mybest password",
   "email": "email (optional)",

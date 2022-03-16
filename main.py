@@ -1,4 +1,13 @@
-from src import *
+from src import (
+    os,
+    time,
+    logging,
+    datetime,
+    get_from_config,
+    get_from_dotenv,
+    attend_class,
+    job,
+)
 
 
 def main():
@@ -16,7 +25,7 @@ def main():
         ],
     )
 
-    attend_class()
+    attend_class(mode=get_from_config, mail=False, verbose=False)
 
     '''
     schedule.every().monday.at('12:30').do(job, 'monday')
