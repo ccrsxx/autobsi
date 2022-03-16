@@ -25,7 +25,7 @@ def main():
         ],
     )
 
-    attend_class(mode=get_from_config, mail=False, verbose=False)
+    attend_class(get=get_from_config, mail=False, verbose=False)
 
     '''
     schedule.every().monday.at('12:30').do(job, 'monday')

@@ -5,8 +5,8 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 
 
-def send_mail(subject, log_path, img_path, mode):
-    email, api_key, target_email = mode('email'), mode('api_key'), mode('target_email')
+def send_mail(subject, log_path, img_path, get):
+    email, api_key, target_email = get('email'), get('api_key'), get('target_email')
 
     with open(img_path, 'rb') as raw_img, open(log_path) as raw_log:
         img = raw_img.read()
@@ -14,8 +14,8 @@ def send_mail(subject, log_path, img_path, mode):
 
     msg = MIMEMultipart()
     msg['Subject'] = subject
-    msg['From'] = mode('email')
-    msg['To'] = mode('email')
+    msg['From'] = get('email')
+    msg['To'] = get('email')
 
     log = MIMEText(log)
     msg.attach(log)

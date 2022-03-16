@@ -66,7 +66,7 @@ class Attend(Base):
         self,
         day: str,
         session: None | int,
-        mode: Callable,
+        get: Callable,
         verbose: bool,
     ):
         super().__init__(verbose)
@@ -78,7 +78,7 @@ class Attend(Base):
             self.login_locator,
             self.attend_locator,
         ) = [
-            mode(key)
+            get(key)
             for key in [
                 'schedule',
                 'username',
@@ -155,9 +155,11 @@ class Attend(Base):
 
 
 def attend_class(
-    mode: Callable = get_from_config, mail: bool = False, verbose: bool = False
+    get: Callable = get_from_config,
+    mail: bool = False,
+    verbose: bool = False,
 ):
-    sch = mode('schedule')
+    sch = get('schedule')
     today = datetime.now().strftime('%A').lower()
 
     if today not in sch:
@@ -171,7 +173,7 @@ def attend_class(
     if any(isinstance(nest, list) for nest in class_schedule):
         for session, (start, end) in enumerate(class_schedule):
             if start <= current_time < end:
-                job(today, session, mode, mail, verbose)
+                job(today, session, get, mail, verbose)
                 break
             elif current_time < start:
                 next_class = start
@@ -179,13 +181,13 @@ def attend_class(
     else:
         start, end = class_schedule
         if start <= current_time < end:
-            job(today, mode=mode, mail=mail, verbose=verbose)
+            job(today, get=get, mail=mail, verbose=verbose)
         elif current_time < start:
             next_class = start
 
     if next_class:
         hour, minute = str(
-            datetime.strptime(next_class, '%H:%M')
+            datetime.strptime(next_class, '%H:%M')  # type: ignore
             - datetime.strptime(current_time, '%H:%M')
         ).split(':')[:-1]
         return logging.info(
@@ -196,13 +198,13 @@ def attend_class(
 def job(
     day: str,
     session: None | int = None,
-    mode: Callable = get_from_dotenv,
+    get: Callable[[str], str] = get_from_dotenv,
     mail: bool = True,
     verbose: bool = False,
 ):
     timer = time.perf_counter()
 
-    driver = Attend(day, session, mode, verbose)
+    driver = Attend(day, session, get, verbose)
 
     logging.info(f'{datetime.now().strftime("%A")} - {driver.class_name}')
     logging.info('Attempting to login...')
@@ -272,6 +274,6 @@ def job(
             f'Attendance Report - {driver.class_name}',
             os.path.join('logs', f'{driver.data_log.split(" - ")[0]}.txt'),
             img_name,
-            mode,
+            get,
         )
         logging.info(f'Attendance report sent')
