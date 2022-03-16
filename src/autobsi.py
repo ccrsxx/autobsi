@@ -1,6 +1,7 @@
 import os
 import time
 import logging
+
 from PIL import Image
 from typing import Type, Callable
 from datetime import datetime
@@ -30,6 +31,12 @@ class Base:
 
     def click(self, method: By, elem: str):
         self.driver.find_element(method, elem).click()
+
+    def clear_log(self, log_name: str):
+        log_name = f'{log_name.split(" - ")[0]}.txt'
+
+        if log_name in os.listdir('logs'):
+            open(os.path.join('logs', log_name), 'w').close()
 
     def check_element(
         self,
@@ -95,6 +102,7 @@ class Attend(Base):
             for key in ['name', 'link']
         ]
         self.data_log = f'{datetime.now().strftime("%d %b")} - {self.class_name}'
+        self.clear_log(self.data_log)
 
     def login(self):
         self.visit(self.login_url)
@@ -106,11 +114,11 @@ class Attend(Base):
             condition=EC.element_to_be_clickable,
         )
 
-        for key in self.login_locator:
+        for key in ['username', 'password']:
             self.input_keys(
                 By.CSS_SELECTOR,
-                self.login_locator[key],
-                getattr(self, key.split('_')[0]),
+                self.login_locator[f'{key}_input'],
+                getattr(self, key),
             )
 
         self.click(By.XPATH, self.login_locator['login_button'])
@@ -185,12 +193,14 @@ def attend_class(
             - datetime.strptime(current_time, '%H:%M')
         ).split(':')[:-1]
         return logging.info(f'Next class starts in {hour} hours and {minute} minutes')
+    else:
+        return logging.info('No more class today')
 
 
 def job(
     day: str,
     session: None | int = None,
-    get: Callable[[str], str] = get_from_dotenv,
+    get: Callable = get_from_dotenv,
     mail: bool = True,
     verbose: bool = False,
 ):
@@ -257,7 +267,9 @@ def job(
 
     driver.driver.close()
 
-    logging.info(f'Automation completed in {time.perf_counter() - timer:.0f} seconds')
+    logging.info(
+        f'Automation {"completed" if not error else "failed"} in {time.perf_counter() - timer:.0f} seconds'
+    )
 
     driver.check_next_class()
 
