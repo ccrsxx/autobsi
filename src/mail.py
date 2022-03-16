@@ -6,6 +6,8 @@ from email.mime.multipart import MIMEMultipart
 
 
 def send_mail(subject, log_path, img_path, mode):
+    email, api_key, target_email = mode('email'), mode('api_key'), mode('target_email')
+
     with open(img_path, 'rb') as raw_img, open(log_path) as raw_log:
         img = raw_img.read()
         log = raw_log.read()
@@ -25,6 +27,6 @@ def send_mail(subject, log_path, img_path, mode):
     conn.ehlo()
     conn.starttls()
     conn.ehlo()
-    conn.login(mode('email'), mode('email_app_password'))
-    conn.sendmail(msg['From'], msg['To'], msg.as_string())
+    conn.login(email, api_key)
+    conn.sendmail(email, target_email, msg.as_string())
     conn.quit()

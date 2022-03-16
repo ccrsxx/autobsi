@@ -180,8 +180,8 @@ def attend_class(
 def job(
     day: str,
     session: int = None,
-    mode: Callable = get_from_config,
-    mail: bool = False,
+    mode: Callable = get_from_dotenv,
+    mail: bool = True,
     verbose: bool = False,
 ):
     timer = time.perf_counter()

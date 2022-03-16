@@ -30,5 +30,6 @@
   "username": "nim",
   "password": "mybest password",
   "email": "email (optional)",
-  "email_app_password": "email api password (optional)"
+  "api_key": "email api_key (optional)",
+  "target_email": "target email (optional)"
 }
