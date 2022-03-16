@@ -169,7 +169,7 @@ def attend_class(
 
     if next_class:
         hour, minute = str(
-            datetime.strptime(next_class, '%H:%M')  # type: ignore
+            datetime.strptime(next_class, '%H:%M')
             - datetime.strptime(current_time, '%H:%M')
         ).split(':')[:-1]
         return logging.info(
@@ -235,7 +235,7 @@ def job(
     img_name = driver.save_screenshot()
 
     if error:
-        logging.info(f'{error}')
+        logging.info('Error while attempting to attend the class')
     elif pending:
         logging.info('No class today')
     elif driver.get_button_status() == 'Kirim':
