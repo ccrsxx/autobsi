@@ -18,8 +18,8 @@ def send_mail(subject: str, log_path: str, img_path: str, get: Callable):
 
     msg = MIMEMultipart()
     msg['Subject'] = subject
-    msg['From'] = get('email')
-    msg['To'] = get('email')
+    msg['From'] = email
+    msg['To'] = target_email
 
     log = MIMEText(log)  # type: ignore
     msg.attach(log)  # type: ignore
