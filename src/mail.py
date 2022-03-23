@@ -1,10 +1,12 @@
-import os
 import smtplib
 
-from typing import Callable
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
+from .autobsi import (
+    os,
+    Callable,
+)
 
 
 def send_mail(subject: str, log_path: str, img_path: str, get: Callable):
@@ -17,6 +19,7 @@ def send_mail(subject: str, log_path: str, img_path: str, get: Callable):
         log = raw_log.read()
 
     msg = MIMEMultipart()
+
     msg['Subject'] = subject
     msg['From'] = email
     msg['To'] = target_email

@@ -4,30 +4,23 @@ from src import (
     os,
     time,
     logging,
-    datetime,
     get_from_config,
-    get_from_dotenv,
     attend_class,
-    job,
 )
 
 
 def main():
-    os.chdir(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'src'))
-
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(message)s',
         datefmt='%H:%M:%S',
         handlers=[
-            logging.FileHandler(
-                os.path.join('logs', f'{datetime.now().strftime("%d %b")}.txt')
-            ),
+            logging.FileHandler(os.path.join('logs', 'temp.txt')),
             logging.StreamHandler(),
         ],
     )
 
-    attend_class(get=get_from_config, mail=False, verbose=False)
+    attend_class(get=get_from_config, mail=False, verbose=False, cloud=False)
 
     '''
     schedule.every().monday.at('12:30').do(job, 'monday')

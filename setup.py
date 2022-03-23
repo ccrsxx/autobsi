@@ -1,5 +1,5 @@
 import os
-import sys
+
 from win32api import GetFileVersionInfo, HIWORD
 from urllib.request import urlopen
 from zipfile import ZipFile
@@ -28,16 +28,7 @@ DRIVER_URLS = {
 
 
 def main():
-    os.chdir(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'src'))
-
     no_chrome = True
-
-    print('Checking needed folder...')
-    for folder in ['logs', 'screenshots']:
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-            print(f'Created {folder}')
-    print('Checking folder done.')
 
     print('Checking If Google Chrome is installed...')
     for chrome_path in CHROME_PATHS:
@@ -54,7 +45,7 @@ def main():
     else:
         print(f'Google Chrome version {chrome_version} detected.')
 
-    os.chdir(os.path.join(os.path.dirname(sys.executable), 'Scripts'))
+    os.chdir('bin')
 
     print(f'Downloading webdriver for Google Chrome version {chrome_version}...')
 

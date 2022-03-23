@@ -3,25 +3,39 @@ import time
 import logging
 
 from PIL import Image
-from typing import Type, Callable
+from typing import Type, Union, Callable
 from datetime import datetime
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
-from .environment import get_from_config, get_from_dotenv
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from .environment import get_from_heroku
 from .mail import send_mail
 
 
 class Base:
-    def __init__(self, verbose: bool):
-        options = Options()
+    def __init__(self, verbose: bool, cloud: bool):
+        options = webdriver.ChromeOptions()
+
+        options.add_experimental_option('excludeSwitches', ['enable-logging'])
+
         if not verbose:
             options.add_argument('headless')
-        options.add_experimental_option('excludeSwitches', ['enable-logging'])
-        self.driver = webdriver.Chrome(options=options, service_log_path='NUL')
+            options.add_argument("--disable-dev-shm-usage")
+            options.add_argument("--no-sandbox")
+
+        chromedriver_location = os.path.join('bin', 'chromedriver.exe')
+
+        if cloud:
+            options.binary_location = os.getenv('GOOGLE_CHROME_BIN')
+            chromedriver_location = os.getenv('CHROMEDRIVER_PATH')  # type: ignore
+
+        self.driver = webdriver.Chrome(
+            executable_path=chromedriver_location,
+            options=options,
+            service_log_path='NUL',
+        )
 
     def visit(self, url: str):
         self.driver.get(url)
@@ -32,11 +46,24 @@ class Base:
     def click(self, method: By, elem: str):
         self.driver.find_element(method, elem).click()
 
-    def clear_log(self, log_name: str):
-        log_name = f'{log_name.split(" - ")[0]}.txt'
+    def rename_logger(self, data_log: str):
+        old_name = os.path.join('logs', 'temp.txt')
+        new_name = f'{os.path.join("logs", data_log)}.txt'
 
-        if log_name in os.listdir('logs'):
-            open(os.path.join('logs', log_name), 'w').close()
+        filehandler = logging.FileHandler(new_name, 'w')
+        formatter = logging.Formatter('%(asctime)s - %(message)s', datefmt='%H:%M:%S')
+
+        filehandler.setFormatter(formatter)
+
+        log = logging.getLogger()
+
+        for handler in log.handlers[:]:
+            if isinstance(handler, logging.FileHandler):
+                log.removeHandler(handler)
+
+        log.addHandler(filehandler)
+
+        os.remove(old_name)
 
     def check_element(
         self,
@@ -59,24 +86,28 @@ class Base:
             return False
         return element
 
-    def save_screenshot(self):
-        img_name = os.path.join('screenshots', f'{self.data_log}.png')
+    def save_screenshot(self, data_log: str, error: bool):
+        img_name = os.path.join('screenshots', f'{data_log}.png')
+        log_name = os.path.join('logs', f'{data_log}.txt')
         self.driver.set_window_size(1920, 1080)
         self.driver.find_element(By.TAG_NAME, 'body').screenshot(img_name)
         self.driver.get_screenshot_as_file(img_name)
-        Image.open(img_name).crop((80, 100, 1900, 330)).save(img_name)
-        return img_name
+        if not error:
+            Image.open(img_name).crop((80, 100, 1900, 330)).save(img_name)
+        return img_name, log_name
 
 
 class Attend(Base):
     def __init__(
         self,
         day: str,
-        session: None | int,
+        session: Union[None, int],
         get: Callable,
         verbose: bool,
+        cloud: bool,
     ):
-        super().__init__(verbose)
+        super().__init__(verbose, cloud)
+
         (
             self.timetable,
             self.username,
@@ -95,14 +126,16 @@ class Attend(Base):
                 'attend_locator',
             ]
         ]
+
         self.class_name, self.class_link = [
             self.timetable[day][key][session]
             if session is not None
             else self.timetable[day][key]
             for key in ['name', 'link']
         ]
+
         self.data_log = f'{datetime.now().strftime("%d %b")} - {self.class_name}'
-        self.clear_log(self.data_log)
+        self.rename_logger(self.data_log)
 
     def login(self):
         self.visit(self.login_url)
@@ -124,7 +157,12 @@ class Attend(Base):
         self.click(By.XPATH, self.login_locator['login_button'])
 
     def get_button_status(self):
-        self.check_element(By.CSS_SELECTOR, '#sidebar', error='Button checking error')
+        try:
+            self.check_element(
+                By.CSS_SELECTOR, '#sidebar', error='Attendance page error!'
+            )
+        except Exception as _:
+            return 'Site Down'
         if ready := self.check_exists(By.XPATH, self.attend_locator['ready']):
             return ready.text
         return self.driver.find_element(By.XPATH, self.attend_locator['not_ready']).text
@@ -135,11 +173,11 @@ class Attend(Base):
             datetime.now().strftime('%A').lower(),
         )
 
-        class_timetable = self.timetable[today]['time']
+        class_schedule = self.timetable[today]['time']
         next_class = False
 
-        if any(isinstance(nest, list) for nest in class_timetable):
-            for start, _ in class_timetable:
+        if any(isinstance(nest, list) for nest in class_schedule):
+            for start, _ in class_schedule:
                 if current_time < start:
                     next_class = start
                     break
@@ -157,9 +195,10 @@ class Attend(Base):
 
 
 def attend_class(
-    get: Callable = get_from_config,
+    get: Callable,
     mail: bool = False,
     verbose: bool = False,
+    cloud: bool = False,
 ):
     timetable = get('timetable')
     today = datetime.now().strftime('%A').lower()
@@ -167,23 +206,25 @@ def attend_class(
     if today not in timetable:
         return logging.info('No class today')
 
-    next_class = False
+    next_class, next_check = False, False
 
-    class_timetable = timetable[today]['time']
+    class_schedule = timetable[today]['time']
     current_time = datetime.now().strftime('%H:%M')
 
-    if any(isinstance(nest, list) for nest in class_timetable):
-        for session, (start, end) in enumerate(class_timetable):
+    if any(isinstance(nest, list) for nest in class_schedule):
+        for session, (start, end) in enumerate(class_schedule):
             if start <= current_time < end:
-                job(today, session, get, mail, verbose)
+                job(today, session, get, mail, verbose, cloud)
+                next_check = True
                 break
             elif current_time < start:
                 next_class = start
                 break
     else:
-        start, end = class_timetable
+        start, end = class_schedule
         if start <= current_time < end:
-            job(today, get=get, mail=mail, verbose=verbose)
+            job(today, get=get, mail=mail, verbose=verbose, cloud=cloud)
+            next_check = True
         elif current_time < start:
             next_class = start
 
@@ -193,90 +234,97 @@ def attend_class(
             - datetime.strptime(current_time, '%H:%M')
         ).split(':')[:-1]
         return logging.info(f'Next class starts in {hour} hours and {minute} minutes')
-    else:
+    elif not next_check:
         return logging.info('No more class today')
 
 
 def job(
     day: str,
-    session: None | int = None,
-    get: Callable = get_from_dotenv,
+    session: Union[None, int] = None,
+    get: Callable = get_from_heroku,
     mail: bool = True,
     verbose: bool = False,
+    cloud: bool = True,
 ):
     timer = time.perf_counter()
 
-    driver = Attend(day, session, get, verbose)
+    browser = Attend(day, session, get, verbose, cloud)
 
-    logging.info(f'{datetime.now().strftime("%A")} - {driver.class_name}')
-    logging.info('Attempting to login...')
+    logging.info(f'{datetime.now().strftime("%A")} - {browser.class_name}')
+    logging.info('Logging in...')
 
-    attempt, retry, pending, error = 0, False, False, False
+    attempt, retry, pending, error, error_msg = 0, False, False, False, ''
 
     try:
-        driver.login()
-        name = driver.check_element(
+        browser.login()
+        name = browser.check_element(
             By.ID, 'eMail', error='Either your username or password is wrong', wait=5
         ).get_attribute('value')
     except Exception as e:
         error = True
-        logging.error(f'{e} - while logging in')
+        error_msg = f'Login error: {e}'
 
     if not error:
         logging.info(f'Success. Logged in as {name.title()}!')
-        logging.info(f'Attempting to attend {driver.class_name}')
+        logging.info(f'Attending {browser.class_name} class...')
 
-        driver.visit(driver.class_link)
+        browser.visit(browser.class_link)
 
         try:
-            while driver.get_button_status() in ['Absen Masuk', 'Belum Mulai']:
-                if attempt == 100:
+            while (status := browser.get_button_status()) and status in [
+                'Absen Masuk',
+                'Belum Mulai',
+                'Site Down',
+            ]:
+                if attempt == 3600:
                     pending = True
                     break
                 if retry:
                     retry = False
-                    time.sleep(60)
-                    driver.driver.refresh()
+                    browser.driver.refresh()
                     continue
                 attempt += 1
                 logging.info(f'Attempt {attempt}')
-                logging.info(f'Button Status: {driver.get_button_status()}')
-                if driver.get_button_status() == 'Belum Mulai':
-                    logging.info(f'Waiting a minute. The class hasn\'t started yet')
+                logging.info(f'Button Status: {status}')
+                if status == 'Site Down':
+                    logging.info('Site Down! Retrying now...')
+                    retry = True
+                elif status == 'Belum Mulai':
+                    logging.info(f'It hasn\'t started yet. Retrying now...')
                     retry = True
                 else:
-                    logging.info('Attempting to push the attendance button...')
-                    driver.click(By.XPATH, driver.attend_locator['ready'])
+                    logging.info('Pushing the button...')
+                    browser.click(By.XPATH, browser.attend_locator['ready'])
                     logging.info('Button pushed. Checking...')
         except Exception as e:
             error = True
-            logging.info(f'{e} - while attempting to attend the class')
+            error_msg = f'Attend error: {e}'
 
-    img_name = driver.save_screenshot()
+    img_name, log_name = browser.save_screenshot(
+        data_log=browser.data_log, error=True if error else False
+    )
 
     if error:
-        logging.info('Error while attempting to attend the class')
+        logging.info(f'Error occurred. {error_msg}')
     elif pending:
         logging.info('No class today')
-    elif driver.get_button_status() == 'Kirim':
-        logging.info('Automation success')
-    elif driver.get_button_status() == 'Sudah Selesai':
+    elif status == 'Kirim':
+        logging.info('Automation success' if attempt else 'Already attended')
+    elif status == 'Sudah Selesai':
         logging.info('Class is already over')
     else:
         logging.info('Something went wrong')
 
-    driver.driver.close()
+    browser.driver.close()
 
-    logging.info(
-        f'Automation {"completed" if not error else "failed"} in {time.perf_counter() - timer:.0f} seconds'
-    )
+    logging.info(f'Automation completed in {time.perf_counter() - timer:.2f} seconds')
 
-    driver.check_next_class()
+    browser.check_next_class()
 
     if mail:
         send_mail(
-            f'Attendance Report - {driver.class_name}',
-            os.path.join('logs', f'{driver.data_log.split(" - ")[0]}.txt'),
+            f'Automation {"Success" if not error else "Failed"} - {browser.class_name}',
+            log_name,
             img_name,
             get,
         )
