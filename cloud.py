@@ -1,5 +1,4 @@
 from src import Callable, get_from_heroku
-from src.environment import get_from_dotenv
 
 write_source: Callable[
     [str, str, str], str
