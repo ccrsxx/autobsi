@@ -1,4 +1,5 @@
 import os
+import platform
 
 from win32api import GetFileVersionInfo, HIWORD
 from urllib.request import urlopen
@@ -6,11 +7,11 @@ from zipfile import ZipFile
 from io import BytesIO
 
 CHROME_PATHS = [
-    os.path.join(os.environ['ProgramFiles'], 'Google\Chrome\Application\Chrome.exe'),
+    os.path.join(os.getenv('ProgramFiles'), 'Google\Chrome\Application\Chrome.exe'),
     os.path.join(
-        os.environ['ProgramFiles(x86)'], 'Google\Chrome\Application\Chrome.exe'
+        os.getenv('ProgramFiles(x86)'), 'Google\Chrome\Application\Chrome.exe'
     ),
-    os.path.join(os.environ['LocalAppData'], 'Google\Chrome\Application\Chrome.exe'),
+    os.path.join(os.getenv('LocalAppData'), 'Google\Chrome\Application\Chrome.exe'),
 ]
 
 DRIVER_URLS = {
@@ -28,6 +29,9 @@ DRIVER_URLS = {
 
 
 def main():
+    if platform.system() != 'Windows':
+        return print('This script is only for Windows')
+
     no_chrome = True
 
     print('Checking If Google Chrome is installed...')

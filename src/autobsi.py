@@ -21,14 +21,17 @@ class Base:
 
         if not verbose:
             options.add_argument('headless')
-            options.add_argument("--disable-dev-shm-usage")
-            options.add_argument("--no-sandbox")
+            options.add_argument('--disable-dev-shm-usage')
+            options.add_argument('--no-sandbox')
 
         chromedriver_location = os.path.join('bin', 'chromedriver.exe')
 
         if cloud:
             options.binary_location = os.getenv('GOOGLE_CHROME_BIN')
             chromedriver_location = os.getenv('CHROMEDRIVER_PATH')  # type: ignore
+
+        if not os.path.exists(chromedriver_location):
+            raise Exception('chromedriver not found. Please install it first!')
 
         self.driver = webdriver.Chrome(
             executable_path=chromedriver_location,
