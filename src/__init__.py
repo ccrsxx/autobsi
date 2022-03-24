@@ -7,6 +7,7 @@ from .autobsi import (
     os,
     time,
     logging,
+    Callable,
     attend_class,
     job,
 )

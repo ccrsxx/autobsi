@@ -1,14 +1,17 @@
-from src import get_from_heroku
+from src import Callable, get_from_heroku
+from src.environment import get_from_dotenv
 
-source = (
-    lambda x: f'''
+write_source: Callable[
+    [str, str, str], str
+] = (
+    lambda get_function, attend_function, class_schedule: f'''
 import schedule
 
 from src import (
     os,
     time,
     logging,
-    get_from_heroku,
+    {get_function},
     attend_class,
     job,
 )
@@ -25,9 +28,9 @@ def main():
         ],
     )
 
-    attend_class(get=get_from_heroku, mail=True, verbose=False, cloud=True)
+    {attend_function}
 
-    {x}
+    {class_schedule}
 
     while True:
         schedule.run_pending()
@@ -40,8 +43,17 @@ if __name__ == '__main__':
 )
 
 
-def main():
-    timetable = get_from_heroku('timetable')
+def write_schedule(
+    get: Callable,
+    mail: bool,
+    verbose: bool,
+    cloud: bool,
+):
+    setup = ', '.join(map(str, [get.__name__, mail, verbose, cloud]))
+
+    attend_function = f'attend_class({setup})'
+
+    timetable = get('timetable')
 
     class_schedule = []
 
@@ -52,15 +64,26 @@ def main():
         if isinstance(start_time, list):
             for i, (start_time, _) in enumerate(item['time']):
                 class_schedule.append(
-                    f'schedule.every().{day}.at(\'{start_time}\').do(job, \'{day}\', {i})'
+                    f"schedule.every().{day}.at('{start_time}').do(job, '{day}', {i}, {setup})"
                 )
         else:
             class_schedule.append(
-                f'schedule.every().{day}.at(\'{start_time}\').do(job, \'{day}\')'
+                f"schedule.every().{day}.at('{start_time}').do(job, '{day}', None, {setup})"
             )
 
     with open('server.py', 'w') as f:
-        f.write(source(';'.join(class_schedule)))
+        f.write(write_source(get.__name__, attend_function, ';'.join(class_schedule)))
+
+
+def main():
+    setup = {
+        'get': get_from_heroku,
+        'mail': True,
+        'verbose': False,
+        'cloud': True,
+    }
+
+    write_schedule(**setup)
 
 
 if __name__ == '__main__':

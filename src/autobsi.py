@@ -10,7 +10,6 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from .environment import get_from_heroku
 from .mail import send_mail
 
 
@@ -196,9 +195,9 @@ class Attend(Base):
 
 def attend_class(
     get: Callable,
-    mail: bool = False,
-    verbose: bool = False,
-    cloud: bool = False,
+    mail: bool,
+    verbose: bool,
+    cloud: bool,
 ):
     timetable = get('timetable')
     today = datetime.now().strftime('%A').lower()
@@ -223,7 +222,7 @@ def attend_class(
     else:
         start, end = class_schedule
         if start <= current_time < end:
-            job(today, get=get, mail=mail, verbose=verbose, cloud=cloud)
+            job(today, None, get, mail, verbose, cloud)
             next_check = True
         elif current_time < start:
             next_class = start
@@ -240,11 +239,11 @@ def attend_class(
 
 def job(
     day: str,
-    session: Union[None, int] = None,
-    get: Callable = get_from_heroku,
-    mail: bool = True,
-    verbose: bool = False,
-    cloud: bool = True,
+    session: Union[None, int],
+    get: Callable,
+    mail: bool,
+    verbose: bool,
+    cloud: bool,
 ):
     timer = time.perf_counter()
 
