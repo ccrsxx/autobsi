@@ -39,19 +39,25 @@ Follow all these steps shown below to use the script.
    git clone https://github.com/ccrsxx/autobsi.git
    ```
 
-2. Install the dependencies with pip. Run:
+2. Change the directory to the autobsi folder. Run:
+
+   ```bash
+   cd autobsi
+   ```
+
+3. Install the dependencies with pip. Run:
 
    ```bash
    pip install -r requirements.txt
    ```
 
-3. Install the webdriver for selenium. Run:
+4. Install the webdriver for selenium. Run:
 
    ```bash
    python setup.py
    ```
 
-4. Run the script:
+5. Run the script:
 
    ```bash
    python main.py
