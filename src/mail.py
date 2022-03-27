@@ -3,10 +3,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
-from .autobsi import (
-    os,
-    Callable,
-)
+from .autobsi import os, Callable
 
 
 def send_mail(subject: str, log_path: str, img_path: str, get: Callable):

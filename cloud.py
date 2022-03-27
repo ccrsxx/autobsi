@@ -6,14 +6,7 @@ write_source: Callable[
     lambda get_function, attend_function, class_schedule: f'''
 import schedule
 
-from src import (
-    os,
-    time,
-    logging,
-    {get_function},
-    attend_class,
-    job,
-)
+from src import os, time, logging, {get_function}, attend_class, job
 
 
 def main():
