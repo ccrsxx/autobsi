@@ -3,12 +3,5 @@
 __author__ = """ccrsxx"""
 __version__ = '2.0'
 
-from .autobsi import (
-    os,
-    time,
-    logging,
-    Callable,
-    attend_class,
-    job,
-)
+from .autobsi import os, time, logging, Callable, attend_class, job
 from .environment import *
