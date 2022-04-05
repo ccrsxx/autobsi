@@ -303,7 +303,7 @@ def job(
                     logging.info('Site Down! Retrying now...')
                     retry = True
                 elif status == 'Belum Mulai':
-                    logging.info(f'It hasn\'t started yet. Retrying now...')
+                    logging.info(f"It hasn't started yet. Retrying now...")
                     retry = True
                 else:
                     logging.info('Pushing the button...')
@@ -331,12 +331,12 @@ def job(
 
     browser.driver.close()
 
-    end_timer = time.perf_counter() - timer
+    total_seconds = time.perf_counter() - timer
 
     elapsed_time = (
-        f'{end_timer // 60} minutes and {end_timer % 60} seconds'
-        if end_timer > 60
-        else f'{end_timer} seconds'
+        f'{total_seconds // 60} minutes and {total_seconds % 60} seconds'
+        if total_seconds > 60
+        else f'{total_seconds} seconds'
     )
 
     logging.info(f'Automation completed in {elapsed_time}')
