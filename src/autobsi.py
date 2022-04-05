@@ -261,7 +261,7 @@ def job(
         False,
         False,
         False,
-        '',
+        None,
     )
 
     try:
@@ -314,9 +314,7 @@ def job(
             error = True
             error_msg = f'Attend error: {e}'
 
-    img_name, log_name = browser.save_screenshot(
-        browser.data_log, True if error else False
-    )
+    img_name, log_name = browser.save_screenshot(browser.data_log, error)
 
     if error:
         logging.info(f'Error occurred. {error_msg}')
