@@ -22,12 +22,15 @@ def send_mail(subject: str, log_path: str, img_path: str, get: Callable):
     msg['To'] = target_email
 
     log = MIMEText(log)  # type: ignore
+
     msg.attach(log)  # type: ignore
 
     image = MIMEImage(img, name=os.path.basename(img_path))
+
     msg.attach(image)
 
     conn = smtplib.SMTP('smtp.gmail.com', 587)
+
     conn.ehlo()
     conn.starttls()
     conn.ehlo()

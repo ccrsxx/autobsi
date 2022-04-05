@@ -303,7 +303,7 @@ def job(
             error_msg = f'Attend error: {e}'
 
     img_name, log_name = browser.save_screenshot(
-        data_log=browser.data_log, error=True if error else False
+        browser.data_log, True if error else False
     )
 
     if error:
@@ -319,7 +319,15 @@ def job(
 
     browser.driver.close()
 
-    logging.info(f'Automation completed in {time.perf_counter() - timer:.2f} seconds')
+    end_timer = time.perf_counter() - timer
+
+    elapsed_time = (
+        f'{end_timer // 60} minutes and {end_timer % 60} seconds'
+        if end_timer > 60
+        else f'{end_timer} seconds'
+    )
+
+    logging.info(f'Automation completed in {elapsed_time}')
 
     browser.check_next_class()
 

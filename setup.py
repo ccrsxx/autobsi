@@ -25,6 +25,8 @@ DRIVER_URLS = {
     97: 'https://chromedriver.storage.googleapis.com/97.0.4692.20/chromedriver_win32.zip',
     98: 'https://chromedriver.storage.googleapis.com/98.0.4758.80/chromedriver_win32.zip',
     99: 'https://chromedriver.storage.googleapis.com/99.0.4844.17/chromedriver_win32.zip',
+    100: 'https://chromedriver.storage.googleapis.com/100.0.4896.60/chromedriver_win32.zip',
+    101: 'https://chromedriver.storage.googleapis.com/101.0.4951.15/chromedriver_win32.zip',
 }
 
 
