@@ -255,7 +255,14 @@ def job(
     logging.info(f'{datetime.now().strftime("%A")} - {browser.class_name}')
     logging.info('Logging in...')
 
-    attempt, retry, pending, error, error_msg = 0, False, False, False, ''
+    attempt, pushed, retry, pending, error, error_msg = (
+        0,
+        False,
+        False,
+        False,
+        False,
+        '',
+    )
 
     try:
         browser.login()
@@ -273,11 +280,15 @@ def job(
         browser.visit(browser.class_link)
 
         try:
-            while (status := browser.get_button_status()) and status in [
-                'Absen Masuk',
-                'Belum Mulai',
-                'Site Down',
-            ]:
+            while (status := browser.get_button_status()) and (
+                status
+                in [
+                    'Absen Masuk',
+                    'Belum Mulai',
+                    'Site Down',
+                ]
+                or (not pushed and attempt)
+            ):
                 if attempt == 3600:
                     pending = True
                     break
@@ -298,6 +309,7 @@ def job(
                     logging.info('Pushing the button...')
                     browser.click(By.XPATH, browser.attend_locator['ready'])
                     logging.info('Button pushed. Checking...')
+                    pushed = True
         except Exception as e:
             error = True
             error_msg = f'Attend error: {e}'
