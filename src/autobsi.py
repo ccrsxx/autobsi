@@ -329,7 +329,7 @@ def job(
 
     browser.driver.close()
 
-    total_seconds = time.perf_counter() - timer
+    total_seconds = round(time.perf_counter() - timer)
 
     elapsed_time = (
         f'{total_seconds // 60} minutes and {total_seconds % 60} seconds'
