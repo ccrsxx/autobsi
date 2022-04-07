@@ -10,6 +10,7 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from .utils import get_elapsed_time
 from .mail import send_mail
 
 
@@ -185,13 +186,13 @@ class Attend(Base):
                     break
 
         if next_class:
-            hour, minute = str(
-                datetime.strptime(next_class, '%H:%M')
-                - datetime.strptime(current_time, '%H:%M')
-            ).split(':')[:-1]
-            return logging.info(
-                f'Next class starts in {hour} hours and {minute} minutes'
+            elapsed_time = get_elapsed_time(
+                (
+                    datetime.strptime(next_class, '%H:%M')
+                    - datetime.strptime(current_time, '%H:%M')
+                ).seconds
             )
+            return logging.info(f'Next class starts in {elapsed_time}')
 
         return logging.info('No more class today')
 
@@ -231,11 +232,13 @@ def attend_class(
             next_class = start
 
     if next_class:
-        hour, minute = str(
-            datetime.strptime(next_class, '%H:%M')  # type: ignore
-            - datetime.strptime(current_time, '%H:%M')
-        ).split(':')[:-1]
-        return logging.info(f'Next class starts in {hour} hours and {minute} minutes')
+        elapsed_time = get_elapsed_time(
+            (
+                datetime.strptime(next_class, '%H:%M')  # type: ignore
+                - datetime.strptime(current_time, '%H:%M')
+            ).seconds
+        )
+        return logging.info(f'Next class starts in {elapsed_time}')
     elif not next_check:
         return logging.info('No more class today')
 
@@ -329,13 +332,7 @@ def job(
 
     browser.driver.close()
 
-    total_seconds = round(time.perf_counter() - timer)
-
-    elapsed_time = (
-        f'{total_seconds // 60} minutes and {total_seconds % 60} seconds'
-        if total_seconds > 60
-        else f'{total_seconds} seconds'
-    )
+    elapsed_time = get_elapsed_time(time.perf_counter() - timer)
 
     logging.info(f'Automation completed in {elapsed_time}')
 
