@@ -20,11 +20,7 @@ def get_elapsed_time(seconds: Union[int, float]):
 
     template['seconds'] = seconds % 60
 
-    output_time = []
-
-    for key, value in template.items():
-        if value:
-            output_time.append(f'{value} {key}')
+    output_time = [f'{value} {key}' for key, value in template.items() if value]
 
     if len(output_time) == 3:
         return f'{", ".join(output_time[:-1])} and {output_time[-1]}'
