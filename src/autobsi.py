@@ -73,7 +73,7 @@ class Base:
         method: By,
         elem: str,
         error: str,
-        wait: int = 10,
+        wait: int = 60,
         condition: Type = EC.presence_of_element_located,
     ):
         try:
@@ -143,12 +143,15 @@ class Attend(Base):
     def login(self):
         self.visit(self.login_url)
 
-        self.check_element(
-            By.XPATH,
-            self.login_locator['login_button'],
-            error='Login error',
-            condition=EC.element_to_be_clickable,
-        )
+        try:
+            self.check_element(
+                By.XPATH,
+                self.login_locator['login_button'],
+                error='Site Down',
+                condition=EC.element_to_be_clickable,
+            )
+        except Exception as e:
+            raise Exception(f'Login error: {e}')
 
         for key in ['username', 'password']:
             self.input_keys(
@@ -258,8 +261,9 @@ def job(
     logging.info(f'{datetime.now().strftime("%A")} - {browser.class_name}')
     logging.info('Logging in...')
 
-    attempt, pushed, retry, pending, error, error_msg = (
+    attempt, logged_in, pushed, retry, pending, error, error_msg = (
         0,
+        False,
         False,
         False,
         False,
@@ -267,14 +271,32 @@ def job(
         None,
     )
 
-    try:
-        browser.login()
-        name = browser.check_element(
-            By.ID, 'eMail', error='Either your username or password is wrong', wait=5
-        ).get_attribute('value')
-    except Exception as e:
-        error = True
-        error_msg = f'Login error: {e}'
+    while not logged_in and attempt <= 3600:
+        attempt += 1
+        logging.info(f'Attempt {attempt}')
+
+        try:
+            browser.login()
+            name = browser.check_element(
+                By.ID, 'eMail', error='Either your username or password is wrong'
+            ).get_attribute('value')
+        except Exception as e:
+            error = True
+            error_msg = f'Login error: {e}'
+
+        if error_msg == 'Login error: Site Down':
+            logging.info('Site Down when logging in, retrying...')
+            continue
+
+        if error_msg == 'Login error: Either your username or password is wrong':
+            logging.info(
+                'Either your username or password is wrong, Please check your credentials'
+            )
+            break
+
+        logged_in, error, error_msg = True, False, None
+
+    attempt = 0
 
     if not error:
         logging.info(f'Success. Logged in as {name.title()}!')
