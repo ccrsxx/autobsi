@@ -73,7 +73,7 @@ class Base:
         method: By,
         elem: str,
         error: str,
-        wait: int = 60,
+        wait: int = 10,
         condition: Type = EC.presence_of_element_located,
     ):
         try:
@@ -141,17 +141,16 @@ class Attend(Base):
         self.rename_logger(self.data_log)
 
     def login(self):
-        self.visit(self.login_url)
-
         try:
+            self.visit(self.login_url)
             self.check_element(
                 By.XPATH,
                 self.login_locator['login_button'],
                 error='Site Down',
                 condition=EC.element_to_be_clickable,
             )
-        except Exception as e:
-            raise Exception(f'Login error: {e}')
+        except Exception as _:
+            raise Exception('Site Down')
 
         for key in ['username', 'password']:
             self.input_keys(
@@ -179,8 +178,8 @@ class Attend(Base):
             datetime.now().strftime('%A').lower(),
         )
 
-        class_schedule = self.timetable[today]['time']
         next_class = False
+        class_schedule = self.timetable[today]['time']
 
         if any(isinstance(nest, list) for nest in class_schedule):
             for start, _ in class_schedule:
@@ -277,9 +276,12 @@ def job(
 
         try:
             browser.login()
+
             name = browser.check_element(
                 By.ID, 'eMail', error='Either your username or password is wrong'
             ).get_attribute('value')
+
+            attempt, logged_in, error, error_msg = 0, True, False, None
         except Exception as e:
             error = True
             error_msg = f'Login error: {e}'
@@ -293,10 +295,6 @@ def job(
                 'Either your username or password is wrong, Please check your credentials'
             )
             break
-
-        logged_in, error, error_msg = True, False, None
-
-    attempt = 0
 
     if not error:
         logging.info(f'Success. Logged in as {name.title()}!')
