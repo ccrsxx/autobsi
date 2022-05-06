@@ -300,9 +300,9 @@ def job(
         logging.info(f'Success. Logged in as {name.title()}!')
         logging.info(f'Attending {browser.class_name} class...')
 
-        browser.visit(browser.class_link)
-
         try:
+            browser.visit(browser.class_link)
+
             while (status := browser.get_button_status()) and (
                 status
                 in [
