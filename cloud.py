@@ -1,38 +1,4 @@
-from src import Callable, get_from_heroku
-
-write_source: Callable[
-    [str, str, str], str
-] = (
-    lambda get_function, attend_function, class_schedule: f'''
-import schedule
-
-from src import os, time, logging, {get_function}, attend_class, job
-
-
-def main():
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(message)s',
-        datefmt='%H:%M:%S',
-        handlers=[
-            logging.FileHandler(os.path.join('logs', 'temp.txt')),
-            logging.StreamHandler(),
-        ],
-    )
-
-    {attend_function}
-
-    {class_schedule}
-
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-
-
-if __name__ == '__main__':
-    main()
-'''
-)
+from src import Callable, get_from_heroku, write_cloud_function
 
 
 def write_schedule(
@@ -64,7 +30,11 @@ def write_schedule(
             )
 
     with open('server.py', 'w') as f:
-        f.write(write_source(get.__name__, attend_function, ';'.join(class_schedule)))
+        f.write(
+            write_cloud_function(
+                get.__name__, attend_function, ';'.join(class_schedule)
+            )
+        )
 
 
 def main():
