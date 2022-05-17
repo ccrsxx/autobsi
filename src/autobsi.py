@@ -120,21 +120,21 @@ class Attend(Base):
             self.attend_locator,
         ) = [
             get(key)
-            for key in [
+            for key in (
                 'timetable',
                 'username',
                 'password',
                 'login_url',
                 'login_locator',
                 'attend_locator',
-            ]
+            )
         ]
 
         self.class_name, self.class_link = [
             self.timetable[day][key][session]
             if session is not None
             else self.timetable[day][key]
-            for key in ['name', 'link']
+            for key in ('name', 'link')
         ]
 
         self.data_log = f'{datetime.now().strftime("%d %b")} - {self.class_name}'
@@ -152,7 +152,7 @@ class Attend(Base):
         except Exception as _:
             raise Exception('Site Down')
 
-        for key in ['username', 'password']:
+        for key in ('username', 'password'):
             self.input_keys(
                 By.CSS_SELECTOR,
                 self.login_locator[f'{key}_input'],
@@ -241,7 +241,8 @@ def attend_class(
             ).seconds
         )
         return logging.info(f'Next class starts in {elapsed_time}')
-    elif not next_check:
+
+    if not next_check:
         return logging.info('No more class today')
 
 
@@ -305,11 +306,11 @@ def job(
 
             while (status := browser.get_button_status()) and (
                 status
-                in [
+                in (
                     'Absen Masuk',
                     'Belum Mulai',
                     'Site Down',
-                ]
+                )
                 or (not pushed and attempt)
             ):
                 if attempt == 3600:
