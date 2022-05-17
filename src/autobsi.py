@@ -3,7 +3,7 @@ import time
 import logging
 
 from PIL import Image
-from typing import Type, Union, Callable
+from typing import Type, Union, Callable, Any
 from datetime import datetime
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
@@ -105,7 +105,7 @@ class Attend(Base):
         self,
         day: str,
         session: Union[None, int],
-        get: Callable,
+        get: Callable[[str], Any],
         verbose: bool,
         cloud: bool,
     ):
@@ -200,7 +200,7 @@ class Attend(Base):
 
 
 def attend_class(
-    get: Callable,
+    get: Callable[[str], Any],
     mail: bool,
     verbose: bool,
     cloud: bool,
@@ -249,7 +249,7 @@ def attend_class(
 def job(
     day: str,
     session: Union[None, int],
-    get: Callable,
+    get: Callable[[str], Any],
     mail: bool,
     verbose: bool,
     cloud: bool,

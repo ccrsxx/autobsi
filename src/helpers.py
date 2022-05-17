@@ -5,9 +5,12 @@ from typing import Callable, Any
 
 def write_schedule(get_function: str, attend_function: str, class_schedule: str):
     return f'''
+import os
+import time
+import logging
 import schedule
 
-from src import os, time, logging, {get_function}, attend_class, job
+from src import {get_function}, attend_class, job
 
 
 def main():
