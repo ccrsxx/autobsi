@@ -12,24 +12,30 @@ CHROME_PATHS = [
 ]
 
 DRIVER_URLS = {
-    90: 'https://chromedriver.storage.googleapis.com/90.0.4430.24/chromedriver_win32.zip',
-    91: 'https://chromedriver.storage.googleapis.com/91.0.4472.101/chromedriver_win32.zip',
-    92: 'https://chromedriver.storage.googleapis.com/92.0.4515.43/chromedriver_win32.zip',
-    93: 'https://chromedriver.storage.googleapis.com/93.0.4577.63/chromedriver_win32.zip',
-    94: 'https://chromedriver.storage.googleapis.com/94.0.4606.113/chromedriver_win32.zip',
-    95: 'https://chromedriver.storage.googleapis.com/95.0.4638.69/chromedriver_win32.zip',
-    96: 'https://chromedriver.storage.googleapis.com/96.0.4664.45/chromedriver_win32.zip',
-    97: 'https://chromedriver.storage.googleapis.com/97.0.4692.20/chromedriver_win32.zip',
-    98: 'https://chromedriver.storage.googleapis.com/98.0.4758.80/chromedriver_win32.zip',
-    99: 'https://chromedriver.storage.googleapis.com/99.0.4844.17/chromedriver_win32.zip',
-    100: 'https://chromedriver.storage.googleapis.com/100.0.4896.60/chromedriver_win32.zip',
-    101: 'https://chromedriver.storage.googleapis.com/101.0.4951.15/chromedriver_win32.zip',
+    ver.split('.')[
+        0
+    ]: f'https://chromedriver.storage.googleapis.com/{ver}/chromedriver_win32.zip'
+    for ver in [
+        '90.0.4430.24',
+        '91.0.4472.101',
+        '92.0.4515.43',
+        '93.0.4577.63',
+        '94.0.4606.113',
+        '95.0.4638.69',
+        '96.0.4664.45',
+        '97.0.4692.20',
+        '98.0.4758.80',
+        '99.0.4844.17',
+        '100.0.4896.60',
+        '101.0.4951.15',
+        '102.0.5005.27',
+    ]
 }
 
 
 def main():
     if platform.system() != 'Windows':
-        return print('This script is only for Windows')
+        return print('This setup is only for Windows!')
 
     no_chrome = True
 
@@ -45,17 +51,18 @@ def main():
     if no_chrome:
         print('Google Chrome is not installed.')
         return
-    elif chrome_version < 90:
+
+    if chrome_version < 90:
         print('Google Chrome must be at least at version 90 or higher.')
         return
-    else:
-        print(f'Google Chrome version {chrome_version} detected.')
+
+    print(f'Google Chrome version {chrome_version} detected.')
 
     os.chdir('bin')
 
     print(f'Downloading webdriver for Google Chrome version {chrome_version}...')
 
-    with ZipFile(BytesIO(urlopen(DRIVER_URLS[chrome_version]).read())) as zip:
+    with ZipFile(BytesIO(urlopen(DRIVER_URLS[str(chrome_version)]).read())) as zip:
         zip.extractall()
 
     print('Setup Completed.')
