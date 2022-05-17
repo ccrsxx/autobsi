@@ -67,4 +67,4 @@ def write_entry_point(
         f.write(write_schedule(get.__name__, attend_function, ';'.join(class_schedule)))
 
     if not cloud:
-        os.system('server.py')
+        os.system('python server.py')
