@@ -7,11 +7,8 @@ from zipfile import ZipFile
 from io import BytesIO
 
 CHROME_PATHS = [
-    os.path.join(os.getenv('ProgramFiles'), 'Google\Chrome\Application\Chrome.exe'),
-    os.path.join(
-        os.getenv('ProgramFiles(x86)'), 'Google\Chrome\Application\Chrome.exe'
-    ),
-    os.path.join(os.getenv('LocalAppData'), 'Google\Chrome\Application\Chrome.exe'),
+    os.path.join(os.getenv(path), 'Google\Chrome\Application\Chrome.exe')
+    for path in ('ProgramFiles', 'ProgramFiles(x86)', 'LocalAppData')
 ]
 
 DRIVER_URLS = {
@@ -37,6 +34,7 @@ def main():
     no_chrome = True
 
     print('Checking If Google Chrome is installed...')
+
     for chrome_path in CHROME_PATHS:
         if os.path.exists(chrome_path):
             no_chrome = False
@@ -45,9 +43,11 @@ def main():
             )
 
     if no_chrome:
-        return print('Google Chrome is not installed.')
+        print('Google Chrome is not installed.')
+        return
     elif chrome_version < 90:
-        return print('Google Chrome must be at least at version 90 or higher.')
+        print('Google Chrome must be at least at version 90 or higher.')
+        return
     else:
         print(f'Google Chrome version {chrome_version} detected.')
 

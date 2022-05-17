@@ -1,6 +1,5 @@
+import os
 import json
-
-from .autobsi import os
 
 
 def get_from_config(key: str):
