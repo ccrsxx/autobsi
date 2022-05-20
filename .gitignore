@@ -159,14 +159,10 @@ bin/*
 logs/*
 screenshots/*
 
-# virtual environment
-webdriver
-
 # private key
 secret
 
-# local and cloud functions
-start.py
+# cloud functions
 server.py
 
 # .gitkeep
