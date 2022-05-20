@@ -273,7 +273,7 @@ def job(
 
     while not logged_in and attempt <= 3600:
         attempt += 1
-        logging.info(f'Attempt {attempt}')
+        logging.info(f'Login Attempt {attempt}')
 
         try:
             browser.login()
@@ -321,7 +321,7 @@ def job(
                     browser.driver.refresh()
                     continue
                 attempt += 1
-                logging.info(f'Attempt {attempt}')
+                logging.info(f'Attend Attempt {attempt}')
                 logging.info(f'Button Status: {status}')
                 if status == 'Site Down':
                     logging.info('Site Down! Retrying now...')
