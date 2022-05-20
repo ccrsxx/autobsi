@@ -18,13 +18,17 @@ def get_elapsed_time(seconds: Union[int, float]):
 
     time.minutes = minutes
 
-    if minutes > 60:
+    if minutes >= 60:
         time.hours = minutes // 60
         time.minutes = minutes % 60
 
     time.seconds = seconds % 60
 
-    output_time = [f'{value} {key}' for key, value in asdict(time).items() if value]
+    output_time = [
+        f'{value} {key[:-1] if value == 1 else key}'
+        for key, value in asdict(time).items()
+        if value
+    ]
 
     if len(output_time) == 3:
         return f'{", ".join(output_time[:-1])}, and {output_time[-1]}'
