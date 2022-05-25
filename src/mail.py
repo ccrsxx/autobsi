@@ -1,4 +1,5 @@
 import os
+import ssl
 import smtplib
 
 from typing import Callable
@@ -8,33 +9,30 @@ from email.mime.multipart import MIMEMultipart
 
 
 def send_mail(subject: str, log_path: str, img_path: str, get: Callable):
-    email, api_key, target_email = [
-        get(key) for key in ['email', 'api_key', 'target_email']
-    ]
+    sender = get('email')
+    api_key = get('api_key')
+    receiver = get('target_email')
 
-    with open(img_path, 'rb') as raw_img, open(log_path) as raw_log:
-        img = raw_img.read()
+    message = MIMEMultipart()
+
+    message['Subject'] = subject
+    message['From'] = sender
+    message['To'] = receiver
+
+    with open(log_path) as raw_log, open(img_path, 'rb') as raw_img:
         log = raw_log.read()
+        image = raw_img.read()
 
-    msg = MIMEMultipart()
+    log_file = MIMEText(log)
+    image_file = MIMEImage(image, name=os.path.basename(img_path))
 
-    msg['Subject'] = subject
-    msg['From'] = email
-    msg['To'] = target_email
+    message.attach(log_file)
+    message.attach(image_file)
 
-    log = MIMEText(log)  # type: ignore
+    text = message.as_string()
 
-    msg.attach(log)  # type: ignore
+    context = ssl.create_default_context()
 
-    image = MIMEImage(img, name=os.path.basename(img_path))
-
-    msg.attach(image)
-
-    conn = smtplib.SMTP('smtp.gmail.com', 587)
-
-    conn.ehlo()
-    conn.starttls()
-    conn.ehlo()
-    conn.login(email, api_key)
-    conn.sendmail(email, target_email, msg.as_string())
-    conn.quit()
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as server:
+        server.login(sender, api_key)
+        server.sendmail(sender, receiver, text)
