@@ -6,8 +6,8 @@ autobsi is a script that allows you to automatically attend your class on the My
 
 Make sure you have installed all of the following prerequisites on your machine:
 
-- Python - [Download & Install Python](https://nodejs.org/en/download/).
 - Git - [Download & Install Git](https://git-scm.com/downloads).
+- Python version 3.8 or higher - [Download & Install Python](https://nodejs.org/en/download/).
 - Google Chrome version 90 or higher.
 
 ## Setup
@@ -55,3 +55,11 @@ Follow all these steps shown below to use the script.
    ```bash
    python main.py
    ```
+
+**Note**: If you are running the script locally or on a Windows machine, follow these additional steps in the `main.py`:
+
+1. Change the get method from `get_from_heroku` to `get_from_config`.
+
+2. Change the cloud parameter from `True` to `False`.
+
+3. Change the mail parameter from `True` to `False` to prevent an authentication error traceback. If you have a google mail API, don't change this parameter.
