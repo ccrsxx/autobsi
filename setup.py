@@ -15,7 +15,7 @@ DRIVER_URLS = {
     ver.split('.')[
         0
     ]: f'https://chromedriver.storage.googleapis.com/{ver}/chromedriver_win32.zip'
-    for ver in [
+    for ver in (
         '90.0.4430.24',
         '91.0.4472.101',
         '92.0.4515.43',
@@ -29,13 +29,14 @@ DRIVER_URLS = {
         '100.0.4896.60',
         '101.0.4951.15',
         '102.0.5005.27',
-    ]
+    )
 }
 
 
 def main():
     if platform.system() != 'Windows':
-        return print('This setup is only for Windows!')
+        print('This setup is only for Windows!')
+        return
 
     no_chrome = True
 
