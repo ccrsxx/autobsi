@@ -51,7 +51,7 @@ class Base:
 
     def rename_logger(self, data_log: str):
         old_name = os.path.join('logs', 'temp.txt')
-        new_name = f'{os.path.join("logs", data_log)}.txt'
+        new_name = os.path.join('logs', f'{data_log}.txt')
 
         filehandler = logging.FileHandler(new_name, 'w')
         formatter = logging.Formatter('%(asctime)s - %(message)s', datefmt='%H:%M:%S')
@@ -66,7 +66,8 @@ class Base:
 
         log.addHandler(filehandler)
 
-        os.remove(old_name)
+        if os.path.exists(old_name):
+            os.remove(old_name)
 
     def check_element(
         self,
