@@ -195,7 +195,7 @@ class Attend(Base):
                     - datetime.strptime(current_time, '%H:%M')
                 ).seconds
             )
-            return logging.info(f'Next class starts in {elapsed_time}')
+            return logging.info(f'Next class starts in {elapsed_time} at {next_class}')
 
         return logging.info('No more class today')
 
@@ -241,7 +241,7 @@ def attend_class(
                 - datetime.strptime(current_time, '%H:%M')
             ).seconds
         )
-        return logging.info(f'Next class starts in {elapsed_time}')
+        return logging.info(f'Next class starts in {elapsed_time} at {next_class}')
 
     if not next_check:
         return logging.info('No more class today')
