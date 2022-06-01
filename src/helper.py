@@ -49,6 +49,10 @@ def write_entry_point(
 
     class_schedule = []
 
+    every_day_check = f"schedule.every().day.at('06:00').do(attend_class, {setup})"
+
+    class_schedule.append(every_day_check)
+
     for day in timetable:
         item = timetable[day]
         start_time, _ = item['time']
