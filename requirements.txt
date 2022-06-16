@@ -1,4 +1,4 @@
 pywin32==303;platform_system == "Windows"
 selenium==3.141.0
 schedule==1.1.0
-Pillow==8.4.0
+Pillow==9.0.1
