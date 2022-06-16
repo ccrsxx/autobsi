@@ -74,7 +74,7 @@ class Base:
         method: By,
         elem: str,
         error: str,
-        wait: int = 10,
+        wait: int = 5,
         condition: Type = EC.presence_of_element_located,
     ):
         try:
@@ -272,7 +272,7 @@ def job(
         None,
     )
 
-    while not logged_in and attempt <= 3600:
+    while not logged_in and attempt <= 720:
         attempt += 1
         logging.info(f'Login Attempt {attempt}')
 
@@ -314,7 +314,7 @@ def job(
                 )
                 or (not pushed and attempt)
             ):
-                if attempt == 3600:
+                if attempt == 3600 or (status == 'Site Down' and attempt == 720):
                     pending = True
                     break
                 if retry:
@@ -362,7 +362,7 @@ def job(
 
     if mail:
         send_mail(
-            f'Automation {"Success" if not error else "Failed"} - {browser.class_name}',
+            f'Automation {"Pending" if pending else "Success" if not error else "Failed"} - {browser.class_name}',
             log_name,
             img_name,
             get,
