@@ -280,7 +280,7 @@ def job(
             browser.login()
 
             name = browser.check_element(
-                By.ID, 'eMail', error='Either your username or password is wrong'
+                By.ID, 'name', error='Either your username or password is wrong'
             ).get_attribute('value')
 
             attempt, logged_in, error, error_msg = 0, True, False, None
