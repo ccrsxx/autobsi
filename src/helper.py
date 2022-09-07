@@ -5,41 +5,6 @@ from operator import itemgetter
 from typing import Callable, TypedDict, Any
 
 
-def write_schedule(get_function: str, attend_function: str, class_schedule: str) -> str:
-    return f'''
-import os
-import time
-import logging
-import schedule
-
-from src import {get_function}, attend_class, job
-
-
-def main():
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(message)s',
-        datefmt='%H:%M:%S',
-        handlers=[
-            logging.FileHandler(os.path.join('logs', 'temp.txt')),
-            logging.StreamHandler(),
-        ],
-    )
-
-    {attend_function}
-
-    {class_schedule}
-
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-
-
-if __name__ == '__main__':
-    main()
-'''
-
-
 class Setup(TypedDict):
     get: Callable[[str], Any]
     mail: bool
@@ -82,3 +47,38 @@ def write_entry_point(setup: Setup) -> None:
         f.write(write_schedule(get.__name__, attend_function, ';'.join(class_schedule)))
 
     os.system('python server.py')
+
+
+def write_schedule(get_function: str, attend_function: str, class_schedule: str) -> str:
+    return f'''
+import os
+import time
+import logging
+import schedule
+
+from src import {get_function}, attend_class, job
+
+
+def main():
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(message)s',
+        datefmt='%H:%M:%S',
+        handlers=[
+            logging.FileHandler(os.path.join('logs', 'temp.txt')),
+            logging.StreamHandler(),
+        ],
+    )
+
+    {attend_function}
+
+    {class_schedule}
+
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+
+if __name__ == '__main__':
+    main()
+'''

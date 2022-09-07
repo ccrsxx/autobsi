@@ -27,7 +27,9 @@ class Base:
             options.add_argument('--disable-dev-shm-usage')
             options.add_argument('--no-sandbox')
 
-        chromedriver_location: str | None = os.path.join('bin', 'chromedriver.exe')
+        chromedriver_location: Union[None, str] = os.path.join(
+            'bin', 'chromedriver.exe'
+        )
 
         if cloud:
             options.binary_location = os.getenv('GOOGLE_CHROME_BIN')
