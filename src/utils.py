@@ -1,6 +1,6 @@
-from typing import Union
-
 from dataclasses import dataclass, asdict
+
+from typing import Union
 
 
 def get_elapsed_time(seconds: Union[int, float]) -> str:

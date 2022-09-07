@@ -2,10 +2,11 @@ import os
 import ssl
 import smtplib
 
-from typing import Callable, Any
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
+
+from typing import Callable, Any
 
 
 def send_mail(

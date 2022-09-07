@@ -1,7 +1,8 @@
 import os
 
-from typing import Callable, TypedDict, Any
 from operator import itemgetter
+
+from typing import Callable, TypedDict, Any
 
 
 def write_schedule(get_function: str, attend_function: str, class_schedule: str) -> str:
