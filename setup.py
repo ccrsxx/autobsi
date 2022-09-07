@@ -1,11 +1,12 @@
 import os
 import platform
 
-from typing import cast
 from win32api import GetFileVersionInfo, HIWORD
 from urllib.request import urlopen
 from zipfile import ZipFile
 from io import BytesIO
+
+from typing import cast
 
 CHROME_PATHS = [
     os.path.join(cast(str, os.getenv(path)), 'Google\Chrome\Application\Chrome.exe')
