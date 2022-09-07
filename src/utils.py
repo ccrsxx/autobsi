@@ -1,20 +1,20 @@
-from typing import Union
-
 from dataclasses import dataclass, asdict
 
+from typing import Union
 
-def get_elapsed_time(seconds: Union[int, float]):
+
+def get_elapsed_time(seconds: Union[int, float]) -> str:
     seconds = round(seconds)
 
     minutes = seconds // 60
 
     @dataclass
     class Time:
-        hours: int
-        minutes: int
-        seconds: int
+        hours: int = 0
+        minutes: int = 0
+        seconds: int = 0
 
-    time = Time(0, 0, 0)
+    time = Time()
 
     time.minutes = minutes
 
