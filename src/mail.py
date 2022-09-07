@@ -2,13 +2,15 @@ import os
 import ssl
 import smtplib
 
-from typing import Callable
+from typing import Callable, Any
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 
 
-def send_mail(subject: str, log_path: str, img_path: str, get: Callable):
+def send_mail(
+    subject: str, log_path: str, img_path: str, get: Callable[[str], Any]
+) -> None:
     sender = get('email')
     api_key = get('api_key')
     receiver = get('target_email')

@@ -1,13 +1,14 @@
 import os
 import platform
 
+from typing import cast
 from win32api import GetFileVersionInfo, HIWORD
 from urllib.request import urlopen
 from zipfile import ZipFile
 from io import BytesIO
 
 CHROME_PATHS = [
-    os.path.join(os.getenv(path), 'Google\Chrome\Application\Chrome.exe')
+    os.path.join(cast(str, os.getenv(path)), 'Google\Chrome\Application\Chrome.exe')
     for path in ('ProgramFiles', 'ProgramFiles(x86)', 'LocalAppData')
 ]
 
@@ -36,7 +37,7 @@ DRIVER_URLS = {
 }
 
 
-def main():
+def main() -> None:
     if platform.system() != 'Windows':
         print('This setup is only for Windows!')
         return

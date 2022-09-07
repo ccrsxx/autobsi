@@ -3,19 +3,21 @@ import time
 import logging
 
 from PIL import Image
-from typing import Type, Union, Callable, Any
 from datetime import datetime
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from .utils import get_elapsed_time
 from .mail import send_mail
 
+from typing import Literal, Tuple, Type, Union, Callable, Any, List
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.common.by import By
+
 
 class Base:
-    def __init__(self, verbose: bool, cloud: bool):
+    def __init__(self, verbose: bool, cloud: bool) -> None:
         options = webdriver.ChromeOptions()
 
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
@@ -25,13 +27,13 @@ class Base:
             options.add_argument('--disable-dev-shm-usage')
             options.add_argument('--no-sandbox')
 
-        chromedriver_location = os.path.join('bin', 'chromedriver.exe')
+        chromedriver_location: str | None = os.path.join('bin', 'chromedriver.exe')
 
         if cloud:
             options.binary_location = os.getenv('GOOGLE_CHROME_BIN')
-            chromedriver_location = os.getenv('CHROMEDRIVER_PATH')  # type: ignore
+            chromedriver_location = os.getenv('CHROMEDRIVER_PATH')
 
-        if not os.path.exists(chromedriver_location):
+        if not chromedriver_location or not os.path.exists(chromedriver_location):
             raise Exception('chromedriver not found. Please install it first!')
 
         self.driver = webdriver.Chrome(
@@ -40,16 +42,16 @@ class Base:
             service_log_path='NUL',
         )
 
-    def visit(self, url: str):
+    def visit(self, url: str) -> None:
         self.driver.get(url)
 
-    def input_keys(self, method: By, elem: str, keys: str):
+    def input_keys(self, method: By, elem: str, keys: str) -> None:
         self.driver.find_element(method, elem).send_keys(keys)
 
-    def click(self, method: By, elem: str):
+    def click(self, method: By, elem: str) -> None:
         self.driver.find_element(method, elem).click()
 
-    def rename_logger(self, data_log: str):
+    def rename_logger(self, data_log: str) -> None:
         old_name = os.path.join('logs', 'temp.txt')
         new_name = os.path.join('logs', f'{data_log}.txt')
 
@@ -76,28 +78,33 @@ class Base:
         error: str,
         wait: int = 5,
         condition: Type = EC.presence_of_element_located,
-    ):
+    ) -> WebElement:
         try:
             element = WebDriverWait(self.driver, wait).until(condition((method, elem)))
         except TimeoutException:
             raise Exception(error)
+
         return element
 
-    def check_exists(self, method: By, elem: str):
+    def check_exists(self, method: By, elem: str) -> Union[Literal[False], WebElement]:
         try:
             element = self.driver.find_element(method, elem)
         except NoSuchElementException:
             return False
+
         return element
 
-    def save_screenshot(self, data_log: str, error: bool):
+    def save_screenshot(self, data_log: str, error: bool) -> Tuple[str, str]:
         img_name = os.path.join('screenshots', f'{data_log}.png')
         log_name = os.path.join('logs', f'{data_log}.txt')
+
         self.driver.set_window_size(1920, 1080)
         self.driver.find_element(By.TAG_NAME, 'body').screenshot(img_name)
         self.driver.get_screenshot_as_file(img_name)
+
         if not error:
             Image.open(img_name).crop((80, 100, 1900, 330)).save(img_name)
+
         return img_name, log_name
 
 
@@ -109,7 +116,7 @@ class Attend(Base):
         get: Callable[[str], Any],
         verbose: bool,
         cloud: bool,
-    ):
+    ) -> None:
         super().__init__(verbose, cloud)
 
         (
@@ -141,7 +148,7 @@ class Attend(Base):
         self.data_log = f'{datetime.now().strftime("%d %b")} - {self.class_name}'
         self.rename_logger(self.data_log)
 
-    def login(self):
+    def login(self) -> None:
         try:
             self.visit(self.login_url)
             self.check_element(
@@ -162,39 +169,50 @@ class Attend(Base):
 
         self.click(By.XPATH, self.login_locator['login_button'])
 
-    def get_button_status(self):
+    def get_button_status(self) -> Union[str, WebElement]:
         try:
             self.check_element(
                 By.CSS_SELECTOR, '#sidebar', error='Attendance page error!'
             )
         except Exception as _:
             return 'Site Down'
+
         if ready := self.check_exists(By.XPATH, self.attend_locator['ready']):
             return ready.text
+
         return self.driver.find_element(By.XPATH, self.attend_locator['not_ready']).text
 
-    def check_next_class(self):
+    def check_next_class(self) -> None:
         current_time, today = (
             datetime.now().strftime('%H:%M'),
             datetime.now().strftime('%A').lower(),
         )
 
-        next_class = False
-        class_schedule = self.timetable[today]['time']
+        next_class: Union[Literal[False], str]
 
-        if any(isinstance(nest, list) for nest in class_schedule):
+        next_class = False
+
+        SingleClass = Tuple[str, str]
+        MultipleClass = List[SingleClass]
+
+        ClassType = Union[SingleClass, MultipleClass]
+
+        class_schedule: ClassType = self.timetable[today]['time']
+
+        if isinstance(class_schedule[0], list):
             for start, _ in class_schedule:
                 if current_time < start:
                     next_class = start
                     break
 
         if next_class:
-            elapsed_time = get_elapsed_time(
-                (
-                    datetime.strptime(next_class, '%H:%M')
-                    - datetime.strptime(current_time, '%H:%M')
-                ).seconds
-            )
+            formatted_current_time = datetime.strptime(current_time, '%H:%M')
+            formatted_next_class = datetime.strptime(next_class, '%H:%M')
+
+            seconds_in_between = (formatted_next_class - formatted_current_time).seconds
+
+            elapsed_time = get_elapsed_time(seconds_in_between)
+
             return logging.info(f'Next class starts in {elapsed_time} at {next_class}')
 
         return logging.info('No more class today')
@@ -205,19 +223,21 @@ def attend_class(
     mail: bool,
     verbose: bool,
     cloud: bool,
-):
+) -> None:
     timetable = get('timetable')
     today = datetime.now().strftime('%A').lower()
 
     if today not in timetable:
         return logging.info('No class today')
 
+    next_class: Union[Literal[False], str]
+
     next_class, next_check = False, False
 
     class_schedule = timetable[today]['time']
     current_time = datetime.now().strftime('%H:%M')
 
-    if any(isinstance(nest, list) for nest in class_schedule):
+    if isinstance(class_schedule[0], list):
         for session, (start, end) in enumerate(class_schedule):
             if start <= current_time < end:
                 job(today, session, get, mail, verbose, cloud)
@@ -228,6 +248,7 @@ def attend_class(
                 break
     else:
         start, end = class_schedule
+
         if start <= current_time < end:
             job(today, None, get, mail, verbose, cloud)
             next_check = True
@@ -235,12 +256,13 @@ def attend_class(
             next_class = start
 
     if next_class:
-        elapsed_time = get_elapsed_time(
-            (
-                datetime.strptime(next_class, '%H:%M')  # type: ignore
-                - datetime.strptime(current_time, '%H:%M')
-            ).seconds
-        )
+        formatted_current_time = datetime.strptime(current_time, '%H:%M')
+        formatted_next_class = datetime.strptime(next_class, '%H:%M')
+
+        seconds_in_between = (formatted_next_class - formatted_current_time).seconds
+
+        elapsed_time = get_elapsed_time(seconds_in_between)
+
         return logging.info(f'Next class starts in {elapsed_time} at {next_class}')
 
     if not next_check:
@@ -254,7 +276,7 @@ def job(
     mail: bool,
     verbose: bool,
     cloud: bool,
-):
+) -> None:
     timer = time.perf_counter()
 
     browser = Attend(day, session, get, verbose, cloud)
@@ -317,13 +339,16 @@ def job(
                 if attempt == 3600 or (status == 'Site Down' and attempt == 720):
                     pending = True
                     break
+
                 if retry:
                     retry = False
                     browser.driver.refresh()
                     continue
+
                 attempt += 1
                 logging.info(f'Attend Attempt {attempt}')
                 logging.info(f'Button Status: {status}')
+
                 if status == 'Site Down':
                     logging.info('Site Down! Retrying now...')
                     retry = True

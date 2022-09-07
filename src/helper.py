@@ -1,9 +1,10 @@
 import os
 
-from typing import Callable, Any
+from typing import Callable, TypedDict, Any
+from operator import itemgetter
 
 
-def write_schedule(get_function: str, attend_function: str, class_schedule: str):
+def write_schedule(get_function: str, attend_function: str, class_schedule: str) -> str:
     return f'''
 import os
 import time
@@ -38,18 +39,27 @@ if __name__ == '__main__':
 '''
 
 
-def write_entry_point(
-    get: Callable[[str], Any], mail: bool, verbose: bool, cloud: bool
-):
-    setup = ', '.join(map(str, [get.__name__, mail, verbose, cloud]))
+class Setup(TypedDict):
+    get: Callable[[str], Any]
+    mail: bool
+    verbose: bool
+    cloud: bool
 
-    attend_function = f'attend_class({setup})'
+
+def write_entry_point(setup: Setup) -> None:
+    get, mail, verbose, cloud = itemgetter('get', 'mail', 'verbose', 'cloud')(setup)
+
+    setup_config = ', '.join(map(str, [get.__name__, mail, verbose, cloud]))
+
+    attend_function = f'attend_class({setup_config})'
 
     timetable = get('timetable')
 
     class_schedule = []
 
-    every_day_check = f"schedule.every().day.at('06:00').do(attend_class, {setup})"
+    every_day_check = (
+        f"schedule.every().day.at('06:00').do(attend_class, {setup_config})"
+    )
 
     class_schedule.append(every_day_check)
 
@@ -60,15 +70,14 @@ def write_entry_point(
         if isinstance(start_time, list):
             for i, (start_time, _) in enumerate(item['time']):
                 class_schedule.append(
-                    f"schedule.every().{day}.at('{start_time}').do(job, '{day}', {i}, {setup})"
+                    f"schedule.every().{day}.at('{start_time}').do(job, '{day}', {i}, {setup_config})"
                 )
         else:
             class_schedule.append(
-                f"schedule.every().{day}.at('{start_time}').do(job, '{day}', None, {setup})"
+                f"schedule.every().{day}.at('{start_time}').do(job, '{day}', None, {setup_config})"
             )
 
     with open('server.py', 'w') as f:
         f.write(write_schedule(get.__name__, attend_function, ';'.join(class_schedule)))
 
-    if not cloud:
-        os.system('python server.py')
+    os.system('python server.py')

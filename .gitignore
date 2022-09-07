@@ -155,12 +155,13 @@ cython_debug/
 .vscode
 
 # bin, logs, and screenshots files
-bin/*
-logs/*
-screenshots/*
+bin/
+logs/
+screenshots/
 
-# private key
-secret
+# env variables
+secret/
+.env*
 
 # cloud functions
 server.py
