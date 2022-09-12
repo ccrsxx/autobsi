@@ -29,16 +29,16 @@ def write_entry_point(setup: Setup) -> None:
 
     class_schedule.append(every_day_check)
 
-    for day in timetable:
-        item = timetable[day]
-        start_time, _ = item['time']
+    for day, data in timetable.items():
+        current_schedule = data['time']
 
-        if isinstance(start_time, list):
-            for i, (start_time, _) in enumerate(item['time']):
+        if isinstance(current_schedule[0], list):
+            for i, (start_time, _) in enumerate(current_schedule):
                 class_schedule.append(
                     f"schedule.every().{day}.at('{start_time}').do(job, '{day}', {i}, {setup_config})"
                 )
         else:
+            start_time = current_schedule[0]
             class_schedule.append(
                 f"schedule.every().{day}.at('{start_time}').do(job, '{day}', None, {setup_config})"
             )
