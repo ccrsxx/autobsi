@@ -166,5 +166,8 @@ secret/
 # cloud functions
 server.py
 
+# local test
+test.py
+
 # .gitkeep
 !.gitkeep
