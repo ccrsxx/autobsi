@@ -31,14 +31,14 @@ def write_entry_point(setup: Setup) -> None:
 
     for day, data in timetable.items():
         current_schedule = data['time']
+        start_time = current_schedule[0]
 
-        if isinstance(current_schedule[0], list):
+        if isinstance(start_time, list):
             for i, (start_time, _) in enumerate(current_schedule):
                 class_schedule.append(
                     f"schedule.every().{day}.at('{start_time}').do(job, '{day}', {i}, {setup_config})"
                 )
         else:
-            start_time = current_schedule[0]
             class_schedule.append(
                 f"schedule.every().{day}.at('{start_time}').do(job, '{day}', None, {setup_config})"
             )
