@@ -304,8 +304,8 @@ def job(
             browser.login()
 
             name = browser.check_element(
-                By.ID, 'eMail', error='Either your username or password is wrong'
-            ).get_attribute('value')
+                By.CSS_SELECTOR, '#userSettings > .user-name', error='Either your username or password is wrong'
+            ).text
 
             attempt, logged_in, error, error_msg = 0, True, False, None
         except Exception as e:
