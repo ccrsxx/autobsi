@@ -1,4 +1,4 @@
-# [autobsi](https://github.com/ccrsxx/autobsi) &middot; ![Build](https://github.com/ccrsxx/autobsi/actions/workflows/codeql-analysis.yml/badge.svg) [![Heroku](https://pyheroku-badge.herokuapp.com/?app=bsi)](https://autobsi.herokuapp.com) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+# [autobsi](https://github.com/ccrsxx/autobsi) &middot; ![Build](https://github.com/ccrsxx/autobsi/actions/workflows/codeql-analysis.yml/badge.svg) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 autobsi is a script that allows you to automatically attend your class on the My Best BSI site. It features a scheduler that will automatically start the script when your class starts, it is also able to run when you are inside your class schedule. You can run it on your computer or host it on a cloud server like Heroku.
 
