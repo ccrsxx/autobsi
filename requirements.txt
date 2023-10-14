@@ -1,5 +1,5 @@
 pywin32==303;platform_system == "Windows"
-selenium==3.141.0
+selenium==4.9.0
 schedule==1.1.0
 Pillow==9.5.0
-urllib3==1.26.16
+requests==2.31.0
