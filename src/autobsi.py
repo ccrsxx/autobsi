@@ -142,9 +142,11 @@ class Attend(Base):
         ]
 
         self.class_name, self.class_link = [
-            self.timetable[day][key][session]
-            if session is not None
-            else self.timetable[day][key]
+            (
+                self.timetable[day][key][session]
+                if session is not None
+                else self.timetable[day][key]
+            )
             for key in ('name', 'link')
         ]
 
@@ -162,7 +164,7 @@ class Attend(Base):
             )
         except Exception as _:
             raise Exception('Site Down')
-        
+
         for key in ('username', 'password'):
             self.input_keys(
                 By.CSS_SELECTOR,
@@ -173,16 +175,16 @@ class Attend(Base):
         captcha_code = self.get_captcha_code()
 
         self.input_keys(
-            By.CSS_SELECTOR,
-            self.login_locator['captcha_input'],
-            captcha_code
+            By.CSS_SELECTOR, self.login_locator['captcha_input'], captcha_code
         )
 
         self.click(By.XPATH, self.login_locator['login_button'])
 
     def get_captcha_code(self) -> str:
         captcha_element = self.check_element(
-            By.CSS_SELECTOR, self.login_locator['captcha_question'], error='Captcha not found'
+            By.CSS_SELECTOR,
+            self.login_locator['captcha_question'],
+            error='Captcha not found',
         )
 
         list_of_numbers = captcha_element.text.split(' + ')[-3:]
@@ -192,14 +194,12 @@ class Attend(Base):
         for possible_numbers in list_of_numbers:
             parsed_number = sub('[^\d]+', '', possible_numbers)
 
-            if (parsed_number): 
+            if parsed_number:
                 valid_numbers.append(int(parsed_number))
 
-
         captcha_code = sum(valid_numbers)
-        
-        return str(captcha_code)
 
+        return str(captcha_code)
 
     def get_button_status(self) -> Union[str, WebElement]:
         try:
@@ -334,7 +334,9 @@ def job(
             browser.login()
 
             name = browser.check_element(
-                By.CSS_SELECTOR, '#userSettings > .user-name', error='Either your username or password is wrong'
+                By.CSS_SELECTOR,
+                '#userSettings > .user-name',
+                error='Either your username or password is wrong',
             ).text
 
             attempt, logged_in, error, error_msg = 0, True, False, None
