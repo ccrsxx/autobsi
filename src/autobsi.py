@@ -2,6 +2,7 @@ import os
 import time
 import logging
 
+from re import sub
 from PIL import Image
 from datetime import datetime
 from selenium import webdriver
@@ -161,7 +162,7 @@ class Attend(Base):
             )
         except Exception as _:
             raise Exception('Site Down')
-
+        
         for key in ('username', 'password'):
             self.input_keys(
                 By.CSS_SELECTOR,
@@ -169,7 +170,36 @@ class Attend(Base):
                 getattr(self, key),
             )
 
+        captcha_code = self.get_captcha_code()
+
+        self.input_keys(
+            By.CSS_SELECTOR,
+            self.login_locator['captcha_input'],
+            captcha_code
+        )
+
         self.click(By.XPATH, self.login_locator['login_button'])
+
+    def get_captcha_code(self) -> str:
+        captcha_element = self.check_element(
+            By.CSS_SELECTOR, self.login_locator['captcha_question'], error='Captcha not found'
+        )
+
+        list_of_numbers = captcha_element.text.split(' + ')[-3:]
+
+        valid_numbers = []
+
+        for possible_numbers in list_of_numbers:
+            parsed_number = sub('[^\d]+', '', possible_numbers)
+
+            if (parsed_number): 
+                valid_numbers.append(int(parsed_number))
+
+
+        captcha_code = sum(valid_numbers)
+        
+        return str(captcha_code)
+
 
     def get_button_status(self) -> Union[str, WebElement]:
         try:
