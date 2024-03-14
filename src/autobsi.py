@@ -187,12 +187,12 @@ class Attend(Base):
             error='Captcha not found',
         )
 
-        list_of_numbers = captcha_element.text.split(' + ')[-3:]
+        possible_numbers = captcha_element.text.split(' + ')[-3:]
 
         valid_numbers = []
 
-        for possible_numbers in list_of_numbers:
-            parsed_number = sub('[^\d]+', '', possible_numbers)
+        for possible_number in possible_numbers:
+            parsed_number = sub('[^\d]+', '', possible_number)
 
             if parsed_number:
                 valid_numbers.append(int(parsed_number))
